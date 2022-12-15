@@ -1,0 +1,2035 @@
+
+
+
+
+
+
+
+                          Ephem V4.28 - February 24, 1992
+
+               Copyright (c) 1990,1991,1992 by Elwood Charles Downey
+
+
+
+                                 Table of Contents
+      1.  Introduction ...................................................  3
+      1.1.  References and Acknowledgements ..............................  3
+      2.  Running Ephem ..................................................  4
+      2.1.  Command Line Format ..........................................  4
+      2.2.  Program Operation ............................................  4
+      3.  Screen Fields ..................................................  6
+      3.1.  Top Screen Fields ............................................  6
+      3.2.  The "OCX" column .............................................  7
+      3.3.  Data format columns ..........................................  8
+      3.4.  RiseSet format columns .......................................  8
+      3.5.  Separation format fields .....................................  9
+      3.6.  Jupiter Aux ..................................................  9
+      4.  Date and Time Formats ..........................................  9
+      5.  Configuration File ............................................. 10
+      5.1.  Configuration File fields .................................... 10
+      5.2.  Example ephem.cfg ............................................ 12
+      6.  Menu options ................................................... 12
+      6.1.  Adaptive vs. Standard hzn .................................... 12
+      6.2.  Geocentric vs. Topocentric ................................... 13
+      7.  User Defined Objects: X and Y .................................. 13
+      7.1.  Controlling Object-X or Y Operation .......................... 13
+      7.1.1.  Fixed ...................................................... 14
+      7.1.2.  Elliptical ................................................. 14
+      7.1.3.  Hyperbolic ................................................. 14
+      7.1.4.  Parabolic .................................................. 15
+      7.1.5.  Lookup ..................................................... 15
+      7.1.6.  On or Off .................................................. 15
+      7.2.  Magnitude models ............................................. 16
+      7.2.1.  g/k model .................................................. 16
+      7.2.2.  H/G model .................................................. 16
+      7.3.  Database File ................................................ 17
+      8.  Plotting ....................................................... 17
+      8.1.  Defining plot fields ......................................... 18
+      8.2.  Displaying a plot file ....................................... 18
+      8.3.  Cartesian or Polar coords .................................... 18
+      8.4.  Begin Plotting ............................................... 18
+      8.5.  Stopping Plotting ............................................ 19
+      9.  Listing ........................................................ 19
+      10.  Watching ...................................................... 19
+      10.1.  Trails ...................................................... 19
+      10.2.  Sky dome .................................................... 19
+      10.3.  Alt/az sky .................................................. 19
+      10.4.  Solar System ................................................ 20
+      11.  Searching ..................................................... 20
+      11.1.  Find extreme ................................................ 20
+      11.2.  Find 0 ...................................................... 21
+
+
+
+
+
+
+
+
+
+                                       - 2 -
+
+
+      11.3.  Binary ...................................................... 21
+      11.4.  Define a New function ....................................... 21
+      11.4.1.  Intrinsic functions ....................................... 21
+      11.4.2.  Field Specifiers .......................................... 22
+      11.4.3.  Constants ................................................. 22
+      11.4.4.  Operators ................................................. 22
+      11.5.  Specifying Search Accuracy .................................. 23
+      11.6.  Stop ........................................................ 23
+      11.7.  Example Searches ............................................ 23
+      11.8.  Another Example ............................................. 24
+      11.9.  Caution ..................................................... 24
+      12.  Implementation Notes .......................................... 24
+      12.1.  Program limits .............................................. 25
+      13.  DOS Installation Procedure .................................... 26
+      13.1.  Setting TZ .................................................. 26
+      14.  Known Bugs and Wish List ...................................... 27
+      15.  Sample Screens ................................................ 28
+      16.  Watch Earth, Moon ............................................. 30
+      17.  Colors ........................................................ 30
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 3 -
+
+
+     1.  Introduction
+
+     Ephem is a program that displays ephemerides for all the planets plus any
+     two additional objects.  The additional objects may be fixed or specified
+     via heliocentric elliptical, hyperbolic or parabolic orbital elements to
+     accommodate solar system objects such as asteroids or comets.
+
+     Information displayed about each object includes RA and Dec precessed to
+     any epoch, local azimuth and altitude, heliocentric coordinates, distance
+     from sun and earth, solar elongation, angular size, visual magnitude,
+     illumination percentage, local rise, transit and set times, length of time
+     up, constellation, and angular separations between all combinations of
+     objects.  A special detail of Jupiter's moons and central meridian
+     longitude is also available.
+
+     Observing circumstance information includes UTC and local date and time,
+     local sidereal time, times of astronomical twilight, length of day and
+     night, local temperature, pressure and height above sea level for the
+     refraction model and a monthly calendar.
+
+     RA/Dec calculations are geocentric and include the effects of light travel
+     time, nutation, aberration and precession.  Alt/az and rise/set/transit
+     and, optionally, angular separation calculations are topocentric and
+     include the additional effects of parallax and refraction.
+
+     Plot and listing files of selected field values may be generated as the
+     program runs.  The plot files are full precision floating point values in
+     ASCII intended for export to other plotting programs.  The listing files
+     are tables formatted for more general human reading.  Ephem includes
+     simple quick-look facilities to view these files.
+
+     One may watch the sky or the solar system with a simple character-oriented
+     screen display.
+
+     Ephem may be asked to search for interesting conditions automatically,
+     using several algorithms. Most fields displayed on the screen may be used
+     as terms in an arbitrary arithmetic expression that can be solved for
+     local zero or extrema, or the time of state change of any boolean
+     expression can be found.
+
+     The program is some 11,000 lines of C. It uses only a very simple set of
+     io routines and should be easily ported to any 24x80 ASCII display.  To
+     date, it has been ported to several flavors of Unix, VMS, MS-DOS and,
+     simplistically, the Macintosh using Think-C.
+
+     1.1.  References and Acknowledgements
+
+     The planetary polynomials and correction algorithms are taken, with
+     permission, from "Astronomy With Your Personal Computer", by Peter
+     Duffett-Smith, Cambridge University Press, (c) 1985.
+
+     The constellation determination algorithm is from a paper by Nancy G.
+     Roman, "Identification of a constellation from a position", Publications
+     of the Astronomical Society of the Pacific, Vol.  99, pages 695-699, July
+
+
+
+
+
+
+
+
+
+                                       - 4 -
+
+
+     1987.
+
+     The precession routine is from 1989 Astronomical Almanac.
+
+     Jupiter's moons are based on information in "Astronomical Formulae for
+     Calculators" by Jean Meeus. Richmond, Va., U.S.A., Willmann-Bell, (c)1982.
+     This reference is suitable for identification purposes but is not accurate
+     enough for precise occultation work.
+
+     I would like to thank Craig Counterman for his very competent assistance,
+     Joseph Fedock for his faithful testing and encouragement, Karsten Spang,
+     Richard Dyson, Doug McDonald and Peter Newton for their contributions in
+     porting ephem to various systems, and the many others who have made
+     helpful suggestions along the way.  Finally, I would like to thank all of
+     you who actually use ephem; it is most gratifying to make a program from
+     which others derive value.
+
+     2.  Running Ephem
+
+
+     2.1.  Command Line Format
+
+     To run ephem, just type "ephem".  You may also specify an alternate
+     configuration file, an alternate database file, and specify initial values
+     for several screen fields.  The command line syntax can be summarized as
+     follows:
+
+     ephem [-W m] [-c <config_file>] [-d <database_file>] [field=value  ...]
+
+
+     The default configuration file is named ephem.cfg in the current
+     directory.  Ephem also looks for one named by the EPHEMCFG environment
+     variable, if it is set. You may specify an arbitrary name with the -c
+     option.
+
+     The default database file is named ephem.db in the current directory.
+     Ephem also looks for one named by the EPHEMDB environment variable, if it
+     is set. You may specify an arbitrary name with the -d option.
+
+     The exact format of these files is described below.
+
+     The W option means: enter watch mode m, where m is 1-5; 1=Sky Dome
+     2=AltAz 3=Solar Sys 4=Earth 5=Moon.
+
+     Any additional command line arguments are treated exactly as if they too
+     came from the configuration file.
+
+     2.2.  Program Operation
+
+     When ephem starts, it first displays a disclaimer banner.  Then, after any
+     key is pressed, it reads the configuration file and processes the command
+     line arguments to set the initial values of several fields, accessing the
+     database file if OBJX or OBJY is set, It then draws all fields on the
+     screen with their initial values.  The program then loops advancing time
+     each step, by some amount you may control, and updating all fields each
+     loop.
+
+
+
+
+
+
+
+                                       - 5 -
+
+
+     There are three fields that control this looping behavior.  NStep controls
+     the number of steps, StpSz the amount of time to add each step, and Pause
+     is the amount of real seconds to pause between steps.  Ephem does not
+     pause between steps when plotting or searching is on.  When the number of
+     steps, NStep, goes to 0 or any key is pressed, the looping stops and you
+     enter a command mode.
+
+     Command mode allows you to modify most of the fields.  The idea is that
+     you move to each field on the screen you wish to change and change it.
+     When you have changed everything you want to, type "q" to resume screen
+     updates.
+
+     To change a field:
+
+         1) move the cursor to the field (see below);
+         2) type RETURN;
+         3) type in the new value along the command line at the top according
+            to the format indicated in the prompt. To accept the new value
+            type RETURN, or to leave it unchanged after all type "q".
+
+
+     A few fields don't require you to type anything; just typing RETURN does
+     all the work.  If you can't move to it, you can't change it.
+
+     The arrow keys on most systems move the cursor around.  If these do not
+     function or function incorrectly, the h/j/k/l keys also move the cursor
+     left/down/up/right, respectively.  Motions off any edge of the screen will
+     wrap around.
+
+     Several "hot-keys" move the cursor immediately to frequently used fields.
+     You may move the cursor immediately to a planet row by typing one of the
+     characters SMevmJsunpxy.  "x" and "y" are for the user-defined objects X
+     and y on the bottom rows.  Also, the characters c, d, o, w, L and z move
+     you to the Menu, UT Date, Epoch, Watch, Listing and StpSz fields
+     immediately.
+
+     When you have changed a field that would invalidate any of the other
+     fields the message NEW CIRCUMSTANCES appears in the top center of the
+     screen.  This will remain until you type "q" to allow at least one screen
+     update loop to occur.  If you change any field that causes new
+     circumstances, the StpSz value is not added to the first loop.  Note also
+     that after a series of loops, NStep is automatically reset to 1 so "q"
+     will do exactly one loop and return you to command mode.
+
+     On some systems, you may temporarily escape from ephem while in command
+     mode to run your operating system's command interpretor. This is done by
+     typing an exclamation point (!) followed by your command.  When the
+     command completes, you will return back to ephem where you left off.
+
+     To quit the program, type control-d from command mode.  For a little more
+     help, type ?.  The entire screen may be erased and redrawn with control-l.
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 6 -
+
+
+     3.  Screen Fields
+
+     The screen is divided into two halves, top and bottom.  The top fields are
+     always present. They define the general observing circumstances and
+     control features.
+
+     The bottom half has several different forms. In three of the possible
+     forms the planets and two additional objects are displayed in a table.
+     There is one object per row, and several columns.  The three forms of this
+     portion selected by picking the Menu selection.
+
+     The fourth form is a display of the planetocentric coordinates of the
+     Galilean moons of Jupiter, including a simple graphical display of their
+     locations as seen from Earth, and the central meridian longitude, in two
+     of the adopted rotational systems.
+
+     Some things may be turned off to reduce compute times.  Calculations for
+     each planet may be turned on and off by selecting the planet name field.
+     Calculations for Dawn/Dusk/NiteLn may be turned off by selecting any of
+     these fields.  Planet positions are only updated as often as necessary to
+     match the display precision of the screen unless plotting or searching is
+     on.  In these cases full precision is desired at all times and so
+     positions are always fully recalculated at each iteration.
+
+     Follows is a list and description of each of the fields in each section.
+     Following each name a parenthetical "p" indicates the field may be
+     selected for plotting (see later). All fields may be selected for
+     changing.
+
+
+     3.1.  Top Screen Fields
+
+     LTZ           the local timezone name.  The name field may be changed to
+                   any three-character mnemonic.
+     LT(p)
+     LD(p)         The local time and date are not labeled as such but are to
+                   the right of the local timezone name.  They are individually
+                   selectable.  Time and date fields may be changed as
+                   described in a later section.  Set to "n" to set to "now"
+                   from computer clock.
+     UT(p)
+     UD(p)         The universally coordinated time and date are not labeled as
+                   such but are to the right of the UTC label.  They are
+                   individually selectable.  Time and date fields may be
+                   changed as described in a later section.  Set to "n" to set
+                   to "now" from computer clock.
+     JulianDat(p)  the current Julian date, to about 1-second accuracy.
+     Listing       controls listing; see complete discussion below.
+     Watch         selects the sky dome, altitude/azimuth sky or solar system
+                   displays; see complete discussion below.
+     Search        controls the automatic search feature of ephem. See the
+                   complete discussion below.
+     Plot          controls plotting; see complete discussion below.
+     Menu          controls which menu is in the bottom half of the screen.
+
+
+
+
+
+
+
+
+
+                                       - 7 -
+
+
+                   See their complete discussion below.
+     LST(p)        the current local sidereal time.  set to "n" to set from
+                   computer clock.
+     Dawn(p)       local time when the sun center is 18 degrees below the
+                   horizon before sunrise today.
+     Dusk(p)       local time when the sun center is 18 degrees below the
+                   horizon after sunset today.
+     NiteLn(p)     length of astronomical night, ie, Dawn - Dusk.  If this line
+                   is shown as "-----", it means the sun is either always below
+                   or always above approximately -18 degrees altitude on this
+                   particular day.  This and the Dawn and Dusk lines are blank
+                   when their computation has been turned off.
+     NStep         The number of times the display with be updated (time
+                   advanced by StpSz each step) before entering command mode.
+     StpSz         the amount of time UTC (and its derivatives) is incremented
+                   each loop.  set this to "r" to use real-time based on the
+                   computer clock.  you may also set it in terms of days by
+                   appending a "d" after the number when you set it.
+     Lat(p)        location latitude, positive degrees north of equator.
+     Long(p)       location longitude, positive degrees west of Greenwich
+                   meridian.  set to "N" to set from computer clock.
+     Elev(p)       local elevation of the ground above sea level, in feet. (see
+                   implementation notes).
+     Temp(p)       local surface air temperature, in degrees F.
+     AtmPr(p)      local surface air pressure, in inches of mercury.
+     TZ(p)         hours local time is behind utc, ie, positive west or
+                   negative east of Greenwich.
+     Epoch         the epoch, to the nearest 0.1 years, to which the ra/dec
+                   fields are precessed.  This says (OfDate) when coordinates
+                   are not precessed, ie, are in the epoch of date. Set to "e"
+                   to set to epoch of date.
+     Pause         number of seconds to pause between screen updates. This is
+                   used mainly to set up for free-running unattended operation.
+                   This pause also applies to free-running "watch" screen
+                   updates.  Pausing is not done when plotting or searching is
+                   on.  If pausing is used with StpSz set to RT CLOCK and the
+                   time was set with Now then ephem attempts to synchronize the
+                   time to an integral multiple of pause seconds after the
+                   minute, for aesthetic reasons.
+
+     Also in the upper right of the screen is a calendar for the current local
+     month.  Dates of local new and full moons are marked NM and FM,
+     respectively.
+
+
+     3.2.  The "OCX" column
+
+     The left column of the bottom screen, when displaying planetary
+     information, is labeled "OCX". This is short for "Object-Constellation-
+     eXtra".  It is actually one, two or three adjacent one-column pickable
+     fields.  Select the first column of the name to toggle the display and
+     calculations on and off.  Select the second column of the name to show the
+     constellation in which the object currently resides.  If available, the
+     third column of a planet name can be picked to display additional current
+
+
+
+
+
+
+
+
+
+                                       - 8 -
+
+
+     information relating to the planet. At this time, this feature is only
+     available for Jupiter.
+
+     3.3.  Data format columns
+
+     R.A.(p)       apparent geocentric right ascension of object, precessed to
+                   given epoch, in hours, minutes and decimal minutes.
+     Dec(p)        apparent geocentric declination of object, precessed to
+                   given epoch, in degrees and minutes.
+     Az(p)         degrees eastward of true north for object.
+     Alt(p)        degrees up from a horizontal plane Elev feet above sea
+                   level.
+     H Long(p)     true heliocentric longitude, in degrees.  Earth's is
+                   displayed on the sun's line.  For the moon this is the
+                   geocentric longitude.
+     H Lat(p)      true heliocentric latitude, in degrees.  For the moon this
+                   is the geocentric latitude.
+     Ea Dst(p)     true distance from Earth center to object center, in AU,
+                   except distance to the moon is in miles.
+     Sn Dst(p)     true distance from sun center to object center, in AU.
+     Elong(p)      spherical angular separation between sun and given object,
+                   calculated from the their geocentric ecliptic coordinates.
+                   Note this is not just the difference in ecliptic longitude.
+                   The sign, however, is simply sign(obj's longitude - sun's
+                   longitude), ie, degrees east.  thus, a positive elongation
+                   means the object rises after the sun.  This field is not
+                   generally useful in searching for conjunctions because of
+                   the discontinuous sign change that occurs at conjunction.
+     Size(p)       angular size of object, in arc seconds.
+     VMag(p)       visual magnitude of object.
+     Phs(p)        percent of visible surface in sunlight. Note the moon phase
+                   is calculated simplistically as just abs(elongation)/180*100
+                   which can be a few degrees off... this means that because of
+                   how elongation is defined it doesn't say 0 during new moon
+                   (or 100 during full) except during close eclipses (maybe
+                   that's a "feature"?).
+     Also, some terminals scroll when a character is written to the lower right
+     character position. To avoid this, Object Y's phase is left shifted by one
+     column. This can look particularly ugly when the phase is 100% because the
+     "100" is right next to visual magnitude number.
+     If desired, the angle between Earth and Sun from the object, p, can be
+     computed from the illumination percentage, i, with the following relation:
+
+         cos (p) = i/50 - 1
+
+
+     3.4.  RiseSet format columns
+     Rise Time
+     Rise Az       The local time and azimuth when the upper limb of the object
+                   rises today.
+     Transit Time
+     Transit Alt   The local time and altitude when the object crosses the
+                   meridian today, ie, when its azimuth is true south or, if no
+                   precession, when the local sidereal time equals the object's
+
+
+
+
+
+
+
+
+
+                                       - 9 -
+
+
+                   right ascension.
+     Set Time
+     Set Az        The local time and azimuth when the upper limb of the object
+                   sets today.
+     Hours Up      The number of hours the object is up on the local date.
+
+     Horizon displacement may be calculated in either of two ways; see the
+     horizon discussion in the Menu selection section.
+
+     Various oddball conditions are accounted for, including an object that is
+     up sometime during the day but that doesn't rise, transit or set as such
+     on that day, an object that is circumpolar or that is never up or one that
+     rises twice on the same day.  These are marked as "Never rises", "Never
+     transits", "Never sets", "Circumpolar", "Never up" or appended with a plus
+     "+" sign, respectively.
+
+     3.5.  Separation format fields
+     This format is a table of angular separations between each pair of
+     objects.  These angles are based on the local altitude/azimuth, and so in
+     general differ somewhat from the elongations reported for the sun in the
+     Data menu.
+     Unfortunately, with the format "ddd:mm", there is not enough room for a
+     space between columns when the angle is at least 100 degrees.  To avoid
+     this, ephem drop the minutes portion if the (rounded) angle is at least
+     100 degrees.
+
+     3.6.  Jupiter Aux
+     This menu option is a table of X, Y and Z coordinates for each of the
+     moons of Jupiter known to Galileo Galilei, that is, its four brightest.
+     The coordinate system is such that the xy plane is the mean plane of the
+     moons orbits, with +x to the east, +y to the north, and +z towards earth.
+     The y coordinate is corrected for earth's angular displacement above or
+     below this plane.
+     The menu also displays the longitude of the central meridian of Jupiter.
+     Three rotational systems have been adopted for this purpose; we show the
+     two that are useful to visual work.
+
+     4.  Date and Time Formats
+     Times are displayed and entered in h:m:s format.  If you pick a time field
+     to change it any of the h, m, and s components that are not specified are
+     left unchanged from their current value.  For example, 0:5:0 set hours to
+     0, minutes to 5, seconds to 0, whereas :5 sets minutes to 5 but leaves
+     hours and seconds unchanged.  A negative time is indicated by a minus sign
+     (-) anywhere before the first digit.
+
+     Dates are displayed and entered in American month:day:year format.  As
+     with time, components omitted when entering a new value retain the current
+     value.  For example, if the current date is 10/20/1988 and you type 20/20
+     the new date will become 20/20/1988. Note you must type the full year
+     since the program is accurate over several centuries either side of 1900.
+     If you change the date, the time (ie, partial day) will not change.
+
+     Negative years indicate BC dates. For example, Jan 1, 1 BC is given as
+     1/1/-1.  There is no year 0.
+
+
+
+
+
+
+
+
+
+                                       - 10 -
+
+
+     Two other ways to set the date are supported for compatibility with some
+     published comet ephemerides.  You may enter the day portion as a real
+     number.  When you set the day this way, the time will also change to
+     correspond to the fractional portion of the day.
+
+     You may also enter a date as a decimal year, as in 1990.12345.  This is
+     also useful in interpreting plot files that include a date field, since
+     date fields are stored in plot files as decimal years.  If no decimal
+     point is included, the number is assumed to be a year unless it is in the
+     range 1-12, in which case it will be taken to mean that you are just
+     changing the month of the current date.  To actually specify the years 1 -
+     12, you must append a decimal point to distinguish them from months.
+
+     As a matter of typing convenience, the program accepts most any character
+     as the separator; you don't have to type a perfect ":" or "/".
+
+     5.  Configuration File
+     The ephem.cfg configuration file allows you to set the initial values of
+     many of the screen fields. You can still change any field while the
+     program is running too; this file just sets the initial conditions.  Note
+     that the order of entries in this file is important because they each take
+     effect immediately.  You should put them in the same order you wish them
+     to be processed, just as though you were changing the fields interactively
+     within ephem.
+
+     The default name of the file is ephem.cfg.  Ephem also looks for one named
+     by the EPHEMCFG environment variable (if defined) or you may specify any
+     name using the -c command line option.
+
+     The format of the file uses the form KEYWORD=VALUE, where the possible
+     KEYWORDS and the types of VALUES for each are described below. Any
+     KEYWORDS not in the file will take on some sort of default. The separator
+     need not be an actual equals sign; any char will do because the VALUE is
+     assumed to start one character after the KEYWORD, regardless.
+
+     All lines that do not begin with an alpha character (a through z, either
+     case) are ignored and may be used for comments.
+
+     Note: because of the way unspecified time and date components are left
+     unchanged (see section on Date and Time Formats) always specify the
+     complete time and date for all entries in the configuration file. For
+     example, to initialize the longitude to zero degrees, say 0:0:0, not just
+     0.
+
+     5.1.  Configuration File fields
+     UD        initial UTC date, such as 10/20/1988, or "NOW" to use the
+               computer clock.
+     UT        initial UTC time, such as 12:0:0, or "NOW" to use the computer
+               clock.
+     TZONE     hours the local time is behind utc, such as 5:0:0.  you need not
+               set this if you use "NOW" for UT or UD.
+     TZNAME    name of the local time zone, such as CDT. 3 chars max.  you need
+               not set this if you use "NOW" for UT or UD.
+     LONG      longitude, in degrees west of Greenwich, in the form d:m:s.
+
+
+
+
+
+
+
+
+
+                                       - 11 -
+
+
+     LAT       latitude, in degrees north of the equator, in the form d:m:s.
+     HEIGHT    height above sea level, in feet, such as 800
+     TEMP      air temperature, in degrees F, such as 50
+     PRES      air pressure, in inches of Mercury, such as 29
+     STPSZ     the time increment between screen updates, such as "1" to give
+               one hour updates. this can be a specific amount or RTC to use
+               the system clock as a real-time source. You may also specify a
+               time in days, by appending a D (or d) after the number.
+     PROPTS    this selects what you want included initially in the display.
+               since IBM-PC math is not very fast, you can reduce the time to
+               update the screen by only printing those fields of interest. the
+               VALUE is a collection of letters to turn on each item from the
+               following set:
+
+                       T       twilight (dawn-dusk)
+                       S       circumstances for the sun
+                       M       circumstances for the moon
+                       e       circumstances for mercury
+                       v       circumstances for venus
+                       m       circumstances for mars
+                       j       circumstances for jupiter
+                       s       circumstances for saturn
+                       u       circumstances for uranus
+                       n       circumstances for neptune
+                       p       circumstances for pluto
+                       x       circumstances for object X
+                       y       circumstances for object Y
+
+               For example, to just track the sun and saturn, say PROPTS=Ss
+
+               If the delimiter between PROPTS and the selection is a plus (+)
+               sign then the given planets are included IN ADDITION TO ones
+               already specified. Any other delimiter sets the selection to
+               exactly the set specified. This feature was added so that the
+               command line version of using PROPTS could add to the set of
+               planets giving in the configuration file.
+     NSTEP     number of times program will loop before entering command mode.
+               see the discussion under Program Operation.
+     EPOCH     this sets the desired ra/dec precession epoch. you can put any
+               date here or EOD to use the current instant ("Epoch of Date").
+     OBJX
+     OBJY      These fields specify the optional objects "x" and "y" by naming
+               any item in the database file. The form is OBJX=xyz, where xyz
+               must be in the database file, case sensitive.  You may define
+               one object of each type for each of OBJX and OBJY; the last one
+               defined will be the "current" one when ephem gets going.
+     PAUSE     The number of seconds to pause between calculation steps. See
+               definition of the Pause field in the "Top Screen Fields"
+               section.
+     MENU      establishes the initial bottom screen menu type.  This should be
+               one of the keywords DATA, RISET, SEP or JUP.  There is no way to
+               set horizon or center suboptions at this time.
+
+
+
+
+
+
+
+
+
+
+
+                                       - 12 -
+
+
+     5.2.  Example ephem.cfg
+
+     This is the ephem.cfg file that was in effect when the sample screens (in
+     another section) were generated. You might run ephem with this
+     configuration file and compare with the samples as a check.
+
+     UT=0;0;0
+     UD=5/1/1990
+     TZNAME=CDT
+     TZONE=5
+     LONG=93:42:8
+     LAT=44:50:37
+     HEIGHT=800
+     TEMP=40
+     PRES=29.5
+     STPSZ=RTC
+     PROPTS=TSMevmjsunpxy
+     EPOCH=2000
+     NSTEP=1
+
+     OBJX=Austin
+     OBJY=Juno
+
+     As another common example, this ephem.cfg creates an essentially free-
+     running real-time screen based on the computer clock:
+
+     UT=Now
+     LONG=90:10:8
+     LAT=40:50:20
+     HEIGHT=800
+     TEMP=50
+     PRES=29
+     STPSZ=RTC
+     PROPTS=TSMevmjsunp
+     NSTEP=9999999
+     EPOCH=Eod
+     PAUSE=30
+
+
+     6.  Menu options
+
+     When you select "Menu" you can change among the three styles of bottom
+     screens. There are also two options that can be set from the Menu quick-
+     choice menu. These options toggle when picked and retain their values so
+     they need only be changed when desired.
+
+     6.1.  Adaptive vs. Standard hzn
+
+     This selects the horizon refraction displacement algorithm used by the
+     Rise/Set menu.  "Adaptive" uses the local atmospheric conditions known to
+     ephem and matches the Planet Info times nicely. "Standard" uses the
+     "accepted nominal" horizon refraction value of 32 arc minutes and usually
+     agrees, to a minute or so, with published tables.
+
+
+
+
+
+
+
+
+
+
+                                       - 13 -
+
+
+     6.2.  Geocentric vs. Topocentric
+
+     This selects the vantage point for the Separation menu. "Geocentric"
+     ignores local conditions and gives the separation as seen from Earth
+     center. "Topocentric" uses the local conditions known to ephem.  They are
+     particularly critical for lunar occultations, but the effect can be
+     significant for the planets.
+
+     Note that searching over a period that will include the rise or set times
+     of either object is generally better performed from the geocentric
+     viewpoint.  The refraction effect of the topocentric viewpoint causes many
+     arcminutes of rapid whiplash displacement as the objects rise and set that
+     overlays the smooth celestial motion of the objects.  This rapid position
+     variation can confuse the solver algorithms that expect fairly smooth
+     functions.
+
+     7.  User Defined Objects: X and Y
+
+     You may specify one or two extra objects for ephem to use. The objects may
+     be defined in four different ways: fixed celestial sphere coordinates, or
+     heliocentric elliptical, hyperbolic or parabolic orbital elements.
+     Elliptical elements are typically useful for periodic comets or asteroids,
+     and hyperbolic and parabolic elements are for nonrecurring solar system
+     interlopers such as aperiodic comets.
+
+     The parameters for each type of object are stored separately, so you may
+     switch between types of objects without losing parameters.
+
+     7.1.  Controlling Object-X or Y Operation
+
+     To control the type and the corresponding details for object X or Y,
+     select the corresponding row near the bottom.  (Remember that typing the
+     character "x" or "y" is a shorthand way to move to the bottom rows.) It
+     will bring up a quick-choice menu as follows:
+
+     Select: Fixed, Elliptical, Hyperbolic, Parabolic, Lookup, On
+
+
+     When you first enter the quick-choice menu the cursor will start out
+     positioned at the field for the current type of object.  The first four
+     selections allow you to enter or review the various parameters required to
+     define an object's position of the respective type, one parameter at a
+     time.
+
+     You set the current object type and begin to view its parameters by
+     positioning the cursor over the type and pressing RETURN.  The prompt for
+     each item includes a short description, the units to use, and its current
+     setting is shown in parentheses. To leave the item unchanged and go to the
+     next item, type RETURN.  If you do not wish to change or see any more
+     items about the object then type "q" and you will return immediately to
+     the object-X quick-choice menu.
+
+     You exit the quick-choice menu by typing "q" while over any field or
+     RETURN while over On or Off, as described in a later section.
+
+
+
+
+
+
+
+
+
+                                       - 14 -
+
+
+     As with all dates throughout ephem, the dates for the epochs of perihelion
+     and reference epochs may be entered in month/day/year or decimal year
+     formats, and the day may be entered as a real number (see the section on
+     Date and Time Formats).  All dates given for comet parameters are always
+     in UT.
+
+     7.1.1.  Fixed
+
+     This selection will present a series of six prompts to define a fixed
+     object. The prompts are the name, RA, Dec, magnitude, the reference epoch
+     for the coordinates and the angular size in arc seconds.
+
+     7.1.2.  Elliptical
+
+     This will begin a series of 13 prompts asking for a name and the
+     parameters that define a heliocentric elliptic orbit and the coefficients
+     for either of two magnitude models.  These elements are the same ones
+     often listed in the Astronomical Almanac.  The elements are, in order:
+
+             i = inclination, degrees
+             O = longitude of ascending node, degrees
+             o = argument of perihelion, degrees
+             a = mean distance (aka semi-major axis), AU
+             n = daily motion, degrees per day
+             e = eccentricity
+             M = mean anomaly (ie, degrees from perihelion)
+             E = epoch date (ie, time of M)
+             D = the equinox year (ie, time of i/O/o)
+             g/k or H/G  = either of two magnitude models; see below
+             s = angular size at 1 AU, arc seconds
+
+
+     You might have other parameters available that can be converted into
+     these.  The following relationships might be useful:
+
+             P = sqrt(a*a*a)
+             p = O + o
+             n = 360/days_per_year/P ~ 0.98563/P
+             T = E - M/n
+             q = a*(1-e)
+         where
+             P = the orbital period, years;
+             p = longitude of perihelion, degrees
+             T = epoch of perihelion (add multiples of P for desired range)
+             q = perihelion distance, AU
+
+     Note that if you know T you can then set E = T and M = 0.
+
+     7.1.3.  Hyperbolic
+
+     This will begin a series of 11 prompts asking for a name and the
+     parameters that define a heliocentric hyperbolic orbit and the magnitude
+     model coefficients.  These orbital parameters are, in order:
+
+
+
+
+
+
+
+
+
+
+                                       - 15 -
+
+
+
+             T = epoch of perihelion
+             i = inclination, degrees
+             O = longitude of ascending node, degrees
+             o = argument of perihelion, degrees
+             e = eccentricity,
+             q = perihelion distance, AU
+             D = the equinox year (ie, time of i/O/o).
+             g/k = magnitude model
+             s = angular size at 1 AU, arc seconds
+
+     As with elliptical elements, other parameters might be available.  The
+     relationships are generally the same, except for:
+
+             q = a*(e-1)
+
+
+     7.1.4.  Parabolic
+
+     This will begin a series of 10 prompts asking for a name and the
+     parameters that define a heliocentric parabolic orbit and the magnitude
+     model coefficients.  These orbital parameters are, in order:
+
+             T = epoch of perihelion
+             i = inclination, degrees
+             o = argument of perihelion, degrees
+             q = perihelion distance, AU
+             O = longitude of ascending node, degrees
+             D = the equinox year (ie, time of i/O/o).
+             g/k = magnitude model
+             s = angular size at 1 AU, arc seconds
+
+
+     7.1.5.  Lookup
+
+     This option displays the name of each object in the database file.  Move
+     around the list (using the usual hjkl or arrow keys) and type RETURN to
+     select an object. The cursor wraps around all edges.  If there is more
+     than one page of entries, you may view the next or previous pages by
+     typing "n" or "p", respectively. Typing "q" will exit the lookup function
+     with no net effect.
+
+     If successful, the cursor will move to the type of the new object and it
+     becomes the current type.
+
+     7.1.6.  On or Off
+
+     The last selection on the right toggles the calculations for the object On
+     and Off.  It toggles when selected with RETURN and then immediately exits
+     the quick-choice menu back to the main menu.  If calculations become On,
+     then they will be performed for the current type of object; if they become
+     Off the object-X or Y row of information will be erased.
+
+
+
+
+
+
+
+
+
+
+
+                                       - 16 -
+
+
+     7.2.  Magnitude models
+
+     Ephem supports two different magnitude models. One, denoted here as g/k,
+     is generally used for comets and is always used for hyperbolic and
+     parabolic objects and optionally for elliptical objects. The other,
+     denoted H/G, is generally used for asteroids in the Astronomical Almanac
+     and may be used with elliptical objects.
+
+     7.2.1.  g/k model
+
+     This model requires two parameters to be specified.  One, the absolute
+     magnitude, g, is the visual magnitude of the object if it were one AU from
+     both the sun and the earth.  The other, the luminosity index, k,
+     characterizes the brightness change of the object as a function of its
+     distance from the sun. This is generally zero, or very small, for inactive
+     objects like asteroids.  The model may be expressed as:
+
+         m = g + 5*log10(D) + 2.5*k*log10(r)
+       where:
+         m = resulting visual magnitude;
+         g = absolute visual magnitude;
+         D = comet-earth distance, in AU;
+         k = luminosity index; and
+         r = comet-sun distance.
+
+     Note that this model does not take into account the phase angle of
+     sunlight.
+
+     When using this model for elliptical objects, the first of the two
+     magnitude fields must be preceded by a letter "g" in both the ephem.db
+     database file and the corresponding quick-choice elliptical object
+     definition prompt; otherwise the default magnitude model for elliptical
+     objects is the H/G model.
+
+     7.2.2.  H/G model
+
+     This model also requires two parameters. The first, H, is the magnitude of
+     the object when one AU from the sun and the earth. The other, G, attempts
+     to model the reflection characteristics of a passive surface, such as an
+     asteroid. The model may be expressed with the following code fragment:
+
+         beta = acos((rp*rp + rho*rho - rsn*rsn)/ (2*rp*rho));
+         psi_t = exp(log(tan(beta/2.0))*0.63);
+         Psi_1 = exp(-3.33*psi_t);
+         psi_t = exp(log(tan(beta/2.0))*1.22);
+         Psi_2 = exp(-1.87*psi_t);
+         m = H + 5.0*log10(rp*rho) - 2.5*log10((1-G)*Psi_1 + G*Psi_2);
+       where:
+         m   = resulting visual magnitude
+         rp  = distance from sun to object
+         rho = distance from earth to object
+         rsn = distance from sun to earth
+
+     Note that this model does not take into account the phase angle of
+
+
+
+
+
+
+
+
+
+                                       - 17 -
+
+
+     sunlight.
+
+     This is the default magnitude model for elliptical objects but it can also
+     be explicitly indicated when the first of the two magnitude fields is
+     preceded by a letter "H" in both the ephem.db database file and the
+     corresponding quick-choice elliptical object definition prompt.
+
+     7.3.  Database File
+
+     You may save a list of objects in a file to be used for setting OBJX and
+     OBJY. The default name of this file is ephem.db. You may also set it from
+     the command line with the -d option, or set it with the EPHEMDB
+     environment variable.
+
+     The file consists of one object per line.  All lines that do not begin
+     with an alpha character are ignored and may be used for comments.  Each
+     line contains several fields, each separated by a comma.  The first field
+     is the name of the object.  The second field is the type of the object,
+     that is, one of the strings "fixed", "elliptical", "hyperbolic" or
+     "parabolic"; actually, "f", "e", "h" and "p" are sufficient.  The
+     remaining fields depend on the type of object.  They are exactly the same
+     parameters, and in the same order, as ephem asks for when defining the
+     object from the menu.  The size field is last and is optional for
+     compatibility with older versions.
+
+     8.  Plotting
+
+     Each time a field is drawn on the screen during a full screen update cycle
+     (that as, during automatic looping or a manual "q" command character from
+     the main menu but not from a screen redraw from control-l or when an
+     individual planet is turned on or a single time field is changed) its
+     full-precision value may be written to a file.  This implies you may not
+     plot a field from other than the current menu at the time plotting is on.
+     You can append several plot runs together, however, if necessary.
+
+     Each line in the file consists of a tag character followed by two or three
+     floating point variables, all separated by commas. If there are two
+     values, they should be interpreted to be x and y (or perhaps r and theta).
+     If there is a third, it is a z or trace value.
+
+     For efficiency on systems that can compute a screen full faster than they
+     can display it, screen updates are suppressed while plotting is on and
+     NStep is greater than 1. This can greatly reduce the time to generate a
+     long plot file. Fields are still logged for plotting; they just are not
+     drawn on the screen.
+
+     The Plot field controls plotting.  Whether plotting is currently active is
+     indicated by "on" or "off" immediately to its right.
+
+     Picking "Plot" brings up a quick-choice menu, as follows:
+
+     Select: Select fields, Display a plot file, Cartesian coords, Begin plotting
+
+
+
+
+
+
+
+
+
+
+
+                                       - 18 -
+
+
+     8.1.  Defining plot fields
+
+     Select the "Select fields" option.  You will be asked to move the cursor
+     to the field you want to use as the x coordinate (abscissa), then asked to
+     choose the y coordinate (ordinate), then asked to choose an optional z
+     trace variable and finally a tag character.  (Of course, you may have in
+     mind fields that are more appropriately displayed in other than Cartesian
+     coordinates, in which case think of x, y and z as dimensions.) If you type
+     q for either x or y then no more fields will be defined.  If you type q
+     for the z field there will be no z field.  You can not label a plot line
+     with the letter "q" at this time.
+
+     This then repeats so you may choose up to ten of these sets for any given
+     plot run.  Each set defines what will become a line on the final plot.
+     Note that you may select the "Search" field to indicate use of the current
+     search function; that function must be defined by the time plotting is
+     turned on.
+
+     If you turn plotting off and back on the fields selected for plotting are
+     reactivated the same as they were last time. You may change them if
+     desired, of course, but there is no need to redefine them if you do not
+     wish to change them.
+
+     8.2.  Displaying a plot file
+
+     Select the "Display a plot file" option to generate a crude plot on the
+     screen of an existing plot file previously created by ephem.  The entries
+     in the file will be drawn on the screen using their tag characters; the
+     plot remains on the screen until you type any character.
+
+     The plot may be made in polar or Cartesian coordinates, depending on the
+     setting of the plotting mode in the quick-choice (see next section).
+
+     8.3.  Cartesian or Polar coords
+
+     This toggles the plotting mode coordinate system.  The mode remains until
+     changed.  Polar coordinates assume the first numeric field in the plot
+     file is the radius, and the second is the angle counterclockwise from
+     right, in degrees.
+
+     8.4.  Begin Plotting
+
+     If plot field lines are defined then the third option, "Begin plotting"
+     will be available.  You will be asked for the name of the file to use.  If
+     it already exists you will be asked whether to overwrite it or append to
+     it.  You will also be asked for a title line that will become the next
+     line of the file, automatically prefixed with a "*" to make it a comment
+     line.  Once you have chosen a file, plotting is on and the top menu
+     plotting status field changes to "on".  The default plot file name is
+     ephem.plt.  The values are written to the plot file each time they are
+     updated on the screen until you select "Plot" again and select the "Stop"
+     option to turn plotting back off.
+
+
+
+
+
+
+
+
+
+
+
+                                       - 19 -
+
+
+     8.5.  Stopping Plotting
+
+     If plotting is on, then selecting the Plot field in the top section will
+     turn plotting off. You may pick Plot again and resume with the same fields
+     by selecting "Begin plotting" again.
+
+     Note that due to internal buffering the plot file will not be completely
+     written to disk until plotting is turned off.
+
+     9.  Listing
+
+     This feature works very much like Plotting. However, the fields you select
+     define columns of a table generated as ephem runs. These columns are look
+     exactly like their corresponding fields on the ephem screen and so are far
+     more readable than plot files.
+
+     See the section on Plotting for an explanation of the quick-choice menu.
+     The general operation is very much the same.
+
+     10.  Watching
+
+     You may generate a simple drawing on the screen of the local sky in two
+     forms or the solar system by selecting "Watch".  It will bring up a
+     quick-choice menu as follows:
+
+     Select: Sky dome, Alt/az sky, Solar system, No trails
+
+
+     10.1.  Trails
+
+     You may either erase after each iteration or leave the tags up, referred
+     to as "trails". Picking the right-most choice will toggle between "No
+     trails" and "Leave trails"; you should set it as desired before you select
+     the style of sky plot you wish.  Ephem will remember your selection.
+
+     10.2.  Sky dome
+
+     This draws the currently active planets within a circle that represents
+     the locally visible hemisphere.  This is similar to the formats commonly
+     used in the popular astronomy magazines.  East is left, south is down,
+     west is right and north is up.
+
+     10.3.  Alt/az sky
+
+     This is a cylindrical projection showing the currently active planets as
+     they would appear in the sky looking southwards at the current time and
+     date.  The coordinate system is such that 0 degrees azimuth (north)
+     through 360 degrees (north, once around) is mapped to the horizontal
+     screen dimension, and 0 degrees altitude (level) through 90 degrees (the
+     zenith) is mapped to the vertical dimension. Thus, the bottom row is the
+     horizon and all across the top is the zenith.
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 20 -
+
+
+     10.4.  Solar System
+
+     This selection draws the currently active planets as they would appear
+     looking "down from the top" of the ecliptic, with the sun at the center
+     and zero hours right ascension towards the right.  The scale is adjusted
+     to roughly fill the screen according to the outer-most active planet.
+     Note that the scaling does not take into account the distances of the user
+     defined objects so, if they don't appear, select a planet that is at least
+     as far out as they are.  The screen transformation assumes a screen aspect
+     width/height ratio of 4/3.  Down the left column of the screen is the
+     heliocentric altitude of the planet above or below the ecliptic, drawn to
+     the same scale as the circular display.  Values so close as to land on the
+     same line are sorted left to right; the S and E symbols always denote
+     heliocentric altitude 0.
+
+     In each style of display, pressing RETURN advances the time by whatever
+     amount StpSz is set to.  Pressing "h" advances the time by one hour, "d"
+     advances by one day, and "w" advances by one week (seven days).  Pressing
+     "q" returns to the watch quick-choice menu from which you may select
+     another display style or return to the main tabular display by typing
+     another "q".  Pressing any other key starts an automatic loop with each
+     step advancing by StpSz; pressing any key stops the looping.
+
+     As symbols are placed, collisions (overstrikes) are avoided by moving
+     characters in such a way as to maintain increasing sorted order towards
+     the right.
+
+     When you return to the main menu, the last watched time will be maintained
+     as the current time.  The StpSz is not changed.
+
+     11.  Searching
+
+     Ephem can search for arbitrary conditions to exist among most displayed
+     fields.  You first enter a function, then select from among three forms of
+     equation solvers to iteratively solve for the next time when the function
+     meets the requirements of the solver. The solver selects the next time for
+     which it wants the function evaluated and sets StpSz so that the next
+     iteration will occur at that time. The solvers continue to iterate until
+     either they achieve their goal or NStep reaches 0.
+
+     You may set NStep to be quite large and let ephem search unattended or set
+     it to 1 and watch it converge one step at a time. You may also plot at the
+     same time as search to record the exact steps ephem took to converge.
+     (But recall that screen updates are suppressed if plotting is also on).
+
+     The "Search" selection in the top half of the screen controls all
+     searching.  Picking it brings up a quick-choice menu as follows:
+
+     Select: Find extreme, Find 0, Binary, New function, Accuracy
+
+
+     11.1.  Find extreme
+
+     This search algorithm searches for a local maximum or a minimum in the
+
+
+
+
+
+
+
+
+
+                                       - 21 -
+
+
+     search function, whichever it finds first. It begins by evaluating the
+     search function at the current time then for two more times each separated
+     by StpSz. It then fits these three points to a parabola and solves it for
+     the time of its maximum (or minimum). StpSz is set so that the next
+     iteration will evaluate at this point.  This parabolic fit solution keeps
+     repeating until StpSz changes by less than the desired accuracy or until
+     the curve becomes so flat that an extrema appears too broad to find.
+
+     11.2.  Find 0
+
+     This search algorithm uses the secant method to solve for the time at
+     which the search function is zero. The function is evaluated at the
+     current time and then again StpSz later to establish a slope for which the
+     x-intercept is found as the next zero guess. This is used to set StpSz for
+     the next desired time value and the slope hunting process repeats until
+     StpSz changes by less than the desired accuracy.
+
+     11.3.  Binary
+
+     This search algorithm must be used with a search function that yields a
+     boolean result, ie, a true or false value. The idea is that the function
+     is assumed to be one truth value when evaluated at the present time, and
+     the opposite truth value when it is evaluated StpSz later. The algorithm
+     will then do a binary search for the time when the truth value changes.
+
+     The binary algorithm does not begin until the state change is bounded in
+     time.  Initially, as long as the truth value at StpSz is the same as the
+     previous value the algorithm will just keep moving in time by StpSz
+     looking for when the state changes.  That is, a linear search is initiated
+     to bound the state change, then the binary search proceeds.
+
+     11.4.  Define a New function
+
+     Select "New function" to display the current search function.  If you type
+     "q" it will be left unchanged.  If you type RETURN it will be erased.  If
+     you type anything else it will be compiled and, if there are no errors, it
+     will become the new search function.  Once a valid function has been
+     stored, it will remain unless changed.  If a search function is selected
+     and there is as yet no valid search function defined, you will
+     automatically be asked to enter one as though you had selected "New
+     function."
+
+     A search function consists of intrinsic functions, field-specifiers,
+     constants and operators, and precedence may be overridden with
+     parentheses.
+
+
+     11.4.1.  Intrinsic functions
+
+     In this release, the only intrinsic functions available are abs(), which
+     returns the absolute value of its argument, and sqrt(), which returns the
+     square root of its argument.
+
+
+
+
+
+
+
+
+
+
+
+                                       - 22 -
+
+
+     11.4.2.  Field Specifiers
+
+     A field in the bottom half of the menu is generally specified in the form
+     of "object_name.column_name". The object_name is enough of the planet or
+     moon name to be unique.  Use "x" or "y" for the user-specified object X or
+     Y.  The column_name is from the following table, depending on which menu
+     is up. In all cases additional characters may be entered but are ignored.
+     Also, you may use x, y and z to specify those columns of the Galilean
+     moons menu.
+
+     Planet Data Menu        Rise/Set Menu               Separation Menu
+     ------------------      --------------------        ---------------
+     al      Alt             hr      Hrs Up, or          j       Jup
+     az      Az              hu      Hrs Up              ma      Mars
+     d       Dec             raz     Rise Az             me      Merc
+     ed      Ea Dst          rt      Rise Time           mo      Moon
+     el      Elong           saz     Set Az              n       Nep
+     hla     Helio Lat       st      Set Time            pl      Pluto
+     hlo     Helio Long      ta      Transit Alt         sa      Saturn
+     ph      Phs             tt      Transit Time        su      Sun
+     ra      R.A.                                        u       Uranus
+     sd      Sn Dst                                      ve      Venus
+     si      Size
+     vm      VMag
+
+
+     A few fields do not use this "dot" notation.  The following top-half
+     fields are indicated using these codes:
+
+     da      Dawn
+     du      Dusk
+     n       NiteLn
+
+
+     Use "jI" and "jII" to indicate one of the two rotational systems of
+     Jupiter's central meridian longitude.
+
+     Remember, searching may only involve fields being calculated for display
+     at the time the solver is active.  While you can syntactically include any
+     field in a search function it is useless to define a search that uses
+     fields from other than the menu that is selected at the time the search is
+     running.
+
+     11.4.3.  Constants
+
+     Constants may be integers or floating point numbers. The latter may be
+     expressed in scientific notation if desired. Examples include 100, .9,
+     1.234, 1e10 and 1.2e-4.  Any number may be preceded by - to make it
+     negative.
+
+     11.4.4.  Operators
+
+     The collection of arithmetic, relational and boolean operators provided
+     mimics those of C language as listed in the following table, in decreasing
+
+
+
+
+
+
+
+
+
+                                       - 23 -
+
+
+     order of precedence.  Operators grouped together have the same precedence
+     and all have left-to-right associativity. Parentheses may be used as
+     desired.
+
+     Symbol  Meaning                 Resulting type
+     ------  --------------------    --------------
+     *       multiply                arithmetic
+     /       divide                  arithmetic
+
+     +       add                     arithmetic
+     -       subtract                arithmetic
+
+     >       greater than            boolean
+     >=      greater than or equal   boolean
+     <       less than               boolean
+     <=      less than or equal      boolean
+
+     ==      equality                boolean
+     !=      inequality              boolean
+
+     &&      logical and             boolean
+
+     ||      logical or              boolean
+
+
+     11.5.  Specifying Search Accuracy
+
+     Selecting "Accuracy" allows you to specify when the search will stop.  The
+     search algorithms will stop when StpSz becomes equal to or less than this
+     value. The default is one minute.  If ephem has not yet converged to the
+     specified accuracy but NStep has decremented to 1, the searching will stop
+     but the search status field will still indicate which search procedure is
+     in effect. To try more iterations you may increase NStep and resume
+     searching. If the accuracy was achieved, the search status field will
+     switch to "off" with the number of "unused" steps remaining in NStep and
+     the last step size in the StpSz fields.
+
+     11.6.  Stop
+
+     If searching is on, this option will also appear on the quick-choice menu
+     and may be selected to turn off the search.
+
+     11.7.  Example Searches
+
+     As an example, let's find when Pluto again becomes the furthest planet
+     from Sol.  You may find when the difference in their sun distance is zero,
+     or you might use a binary search on the condition that Pluto's sun
+     distance is larger then Neptune's.
+
+     To try the former approach select Search, select "Find 0", specify the
+     search function to be:
+
+     pl.sd - nep.sd
+
+
+
+
+
+
+
+
+
+
+                                       - 24 -
+
+
+     set StpSz to something large like 10d, NStep to allow several iterations
+     like 20, and then type "q" to start the search and watch ephem do the
+     hunt.  Ephem will settle on about 21:02 1/10/1999 UT.
+
+     To try a binary search, you first need to have some idea of when the event
+     will occur so you can eliminate the initial linear search for the state
+     change. We can start at, say, 1/1/1999, set StpSz to 30d, select Binary
+     search, specify the search function to be:
+
+     pl.sd > nep.sd
+
+     and go. Once it brackets the state change note how StpSz keeps being cut
+     in half but can go in either direction (sign) as it divides each interval
+     in half.  Ephem will converge on the same answer.
+
+     11.8.  Another Example
+
+     To find the time of last quarter moon during December, 1989, use the "Find
+     0" search algorithm to solve "moon.el + 90".  (At last quarter, the moon
+     is 90 degrees west of the sun, or -90 east in ephem's elongation display.)
+     Set the initial time to mid-month, 12/15/1989, StpSz to 1 day and NStep to
+     10. Ephem takes only a few iterations to settle on 23:57 12/19 UT.
+
+     11.9.  Caution
+
+     Beware that most celestial phenomena are generally pseudo-periodic in
+     nature.  In early search steps ephem can easily skip over a local maxima
+     and find a later one, which, while correct, may not be what was desired.
+     In general, the closer you can be when you start the search the better
+     ephem can refine it; it is not as good with very broad searches that can
+     go "wild". Set StpSz large enough to offer significant change in the
+     function value, but small enough not to skip too far.
+
+     For example, Saturn and Neptune had three close approaches during 1989.
+     If you did not know this then just asking ephem to find a minimum would
+     have produced different results depending on the starting conditions.
+     When starting a search for a certain class of event it is a good idea to
+     first use the plotting or watching facility of ephem to get a broad
+     picture of the general circumstances then use ephem's search facility to
+     refine a given region (or create and inspect a plot file and do your own
+     interpolation directly from it separately).
+
+     Similarly, ephem's searching techniques are not good for eclipses because
+     the moon and sun are close every month; the trick is sorting through the
+     frequent conjunctions for ones that are particularly close. One needs a
+     way of establishing an envelope fit to the local extrema of a cyclic
+     function in order to find a more global extreme.
+
+     12.  Implementation Notes
+
+     Remember that everything is for the current local time and day. So, for
+     example, the calendar marks moon events in local time; commercial
+     calendars usually mark the UT date.  Similarly, the rise/set times are for
+     the current local day.
+
+
+
+
+
+
+
+
+
+                                       - 25 -
+
+
+     The program uses a horizontal plane tangent to the earth as the horizon
+     for all altitude calculations, rise/set events, etc.  This is not the same
+     as the angle up from the local horizon unless the observer is directly on
+     the ground due to earth's curvature.  The effect can be found from:
+
+             sin(a)**2 = (h**2 + 2Rh) / (R+h)**2
+         where:
+             R = radius of earth
+             h = height above ground (same units as R)
+             a = increase in altitude
+
+     For example, the effect is more than two arc minutes at a height of 5
+     feet.
+
+     Visual magnitudes are not very accurate ... I haven't bothered to fix.
+
+     The accuracy of ephem can not be specifically stated since the Duffett-
+     Smith book does not warrant its planet position polynomials to any given
+     degree. I know for sure that better accuracy could be achieved if ephem
+     used TDT but I have not yet decided on a suitable algorithm.  Allowing for
+     this manually, (see the Wish List section) comparisons with the
+     Astronomical Almanac are often within a few arcseconds.
+
+     The program uses double precision throughout. While this precision might
+     seem a little ridiculous, it is actually more efficient for most
+     traditional K&R C compilers and the search functions seem to be are far
+     more stable.
+
+     Searching and plotting always use full precision but if neither of these
+     are turned on pure display and watching only recompute a given planets new
+     location if the time has changed enough to effect the required display
+     precision, based on the planets mean apparent orbital motion.
+
+     The sun-moon distance is the solution for the third side of a planar
+     triangle whose two other sides are the earth-moon distance and earth-sun
+     distance separated by the angle of elongation.
+
+     Beware of computing with the user-defined objects before they are properly
+     defined.
+
+     If a floating point exception occurs ephem will stop further computations
+     on the current screen update and stop any automatic looping.
+
+     12.1.  Program limits
+
+     The search function is limited to a maximum of 32 instructions (each
+     constant, field spec, and operation is one instruction), with no more than
+     a total of 16 constants and field specs. At run time, the function can not
+     require more than 16 stacked values (due to operator precedence or
+     explicit parenthetical expressions) to evaluate.
+
+     No more than 32 different fields can be tracked simultaneously for
+     plotting and/or searching.
+
+
+
+
+
+
+
+
+
+
+                                       - 26 -
+
+
+     No more than 10 lines may be plotted at once.
+
+     The maximum file name length is 14 characters.
+
+     13.  DOS Installation Procedure
+
+     You must be running DOS V2.0 or later, though somewhere between V2.0 and
+     V3.21 the behavior of control-c to terminate the program was fixed.  An
+     8087 floating point chip will be used if present.
+
+     The distribution floppy contains five files:
+     README describes last minute items and details of this release.
+     MAN.TXT is this manual, hopefully formatted and printable on most any
+     printer.
+     EPHEM.EXE is the executable program.
+     EPHEM.CFG is a sample configuration file.
+     EPHEM.DB is a sample database.
+     To run the program, make working copies of these files in a directory and
+     run "ephem" from that directory.
+
+     13.1.  Setting TZ
+
+     Before running ephem, you should set a DOS environment variable, TZ.  It
+     is is used to establish the timezone name and hours offset whenever the
+     "Now" shorthand is used from ephem, either from the configuration startup
+     file or whenever any time field is changed manually.  Set it in the
+     following form:
+
+          set TZ=SSSnDDD
+
+     where
+
+     SSS  is the 3-letter abbreviation for the local standard timezone;
+
+     n    is a number between -23 to 24 indicating the number of hours that are
+          subtracted from GMT to obtain local standard time;
+
+     DDD  is an optional 3-letter abbreviation for the local daylight savings
+          time zone name. Leave it off if you do not have savings time in your
+          area or it is not currently in effect. If the changeover dates differ
+          from the internal algorithm, just use SSS and n directly.
+
+     For example, in the midwestern United States with savings times set
+     TZ=CST6CDT
+
+     If for some reason your system does not change to savings time at the
+     right time, then omit the DDD parameter and just set the SSS and n to
+     exactly what you want.
+
+     You can put this in your AUTOEXEC.BAT file so it gets set each time you
+     boot DOS.
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 27 -
+
+
+     14.  Known Bugs and Wish List
+
+     incorporate Terrestrial Dynamical Time (known as Ephemeris Time prior to
+     1984).  TDT is about 57 seconds ahead of UT1 in 1990.
+
+     it's too easy to turn on objx/y before it's defined and bomb out.
+
+     add explicit searching for eclipses and occultations.
+
+     in watch mode, RTC reverts back to being based off the time when watch was
+     first entered.
+
+     add a facility (or tool) to find g/k from a set of observed magnitudes.
+
+     add search criteria and a screen-based selection mechanism for database
+     objects.
+
+     add plot options to reverse x and/or y direction and add some tick marks.
+
+     continue pursuit of moon and other information for other planets.
+
+     add shorthands for some sidereal and synodic step sizes.
+
+     the built-in elements for pluto need to be updated. the elements for pluto
+     in the included ephem.db database sampler are more accurate.
+
+     plotting or listing rise/set that doesn't happen just reshows the last
+     entry.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 28 -
+
+
+     15.  Sample Screens
+
+     Here are sample ephem screens. They are generated using the first sample
+     ephem.cfg file (listed in the section describing the configuration file).
+     There is one for each of the possible screen formats.  The rise/set screen
+     was done using the Adaptive option.  The separations screen was done using
+     the Topocentric option.
+
+
+
+Move to another field, RETURN to change this field, ? for help, or q to run
+
+CDT 19:00:00  4/30/1990 | LST    8:19:50 | Lat   44:50:37 |      April 1990
+UTC  0:00:00  5/01/1990 |                | Long  93:42:08 | Su Mo Tu We Th Fr Sa
+JulianDat 2448012.50000 | Dawn      4:10 | Elev    800 ft |  1  2  3  4  5  6  7
+Watch                   | Dusk     22:15 | Temp      40 F |  8 FM 10 11 12 13 14
+Listing             off | NiteLn    5:55 | AtmPr 29.50 in | 15 16 17 18 19 20 21
+Search              off |                | TZ     5:00:00 | 22 23 NM 25 26 27 28
+Plot                off | NStep        1 | Epoch   2000.0 | 29 30
+Menu        Planet Data | StpSz RT CLOCK | Pause        0 |
+--------------------------------------------------------------------------------
+OCX  R.A.    Dec    Az     Alt  H Long H Lat  Ea Dst Sn Dst Elong  Size VMag Phs
+Su  2:32.3  14:58 278:40  12:38 220:22        1.0075               1905  -27
+Mo  8:09.9  21:11 186:06  65:53 119:55   1:04 234821 1.0071   79.5 1897  -12  44
+Me  2:49.4  17:39 277:48  17:26 214:08   1:43 0.5764 0.4360    4.9 11.7  1.6   1
+Ve 23:49.4  -2:25 296:53 -27:39 282:39  -1:30 0.9288 0.7276  -43.9 18.2 -4.8  64
+Ma 22:39.8 -10:09 308:17 -44:14 297:56  -1:43 1.5438 1.4067  -62.9  6.1  0.3  89
+Ju  6:30.9  23:23 235:13  59:04 106:16   0:08 5.6806 5.1941   56.6 34.6 -2.0  99
+Sa 19:49.6 -20:53  17:24 -65:14 289:45   0:10 9.7077 10.017 -105.0 17.1  1.1 100
+Ur 18:41.9 -23:24  51:18 -60:39 276:55  -0:18 18.864 19.401 -120.9  3.5  5.6 100
+Ne 19:03.2 -21:46  40:51 -62:01 282:48   0:51 29.754 30.207 -115.8  2.1  7.9 100
+Pl 15:14.8  -1:26  81:18 -10:37 226:18  15:28 28.693 29.658 -162.9  0.3 13.6 100
+X   0:08.3  36:01 316:59   5:58 238:20  26:29 0.5622 0.6657  -38.4  0.0  1.5  33
+Y  15:22.9  -2:40  80:43 -12:54 226:17  10:49 2.3635 3.3381 -162.5  0.0 10.1100
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 29 -
+
+
+Move to another field, RETURN to change this field, ? for help, or q to run
+
+CDT 19:00:00  4/30/1990 | LST    8:19:50 | Lat   44:50:37 |      April 1990
+UTC  0:00:00  5/01/1990 |                | Long  93:42:08 | Su Mo Tu We Th Fr Sa
+JulianDat 2448012.50000 | Dawn      4:10 | Elev    800 ft |  1  2  3  4  5  6  7
+Watch                   | Dusk     22:15 | Temp      40 F |  8 FM 10 11 12 13 14
+Listing             off | NiteLn    5:55 | AtmPr 29.50 in | 15 16 17 18 19 20 21
+Search              off |                | TZ     5:00:00 | 22 23 NM 25 26 27 28
+Plot                off | NStep        1 | Epoch   2000.0 | 29 30
+Menu      Rise/Set Info | StpSz RT CLOCK | Pause        0 |
+--------------------------------------------------------------------------------
+OCX Rise Time    Rise Az  Trans Time  Trans Alt  Set Time    Set Az    Hours Up
+Su     6:05       67:48     13:12       60:01     20:20      292:28     14:15
+Mo    10:54       57:14     18:49       66:01      1:56      304:46     15:02
+Me     6:13       63:34     13:30       62:51     20:47      296:04     14:34
+Ve     4:35       93:02     10:29       42:33     16:23      267:14     11:48
+Ma     3:57      103:53      9:20       34:52     14:43      256:17     10:45
+Ju     9:24       54:59     17:11       68:33      1:00      305:01     15:36
+Sa     1:56      119:18      6:31       24:17     11:06      240:42      9:10
+Ur     1:01      123:08      5:24       21:47      9:46      236:52      8:45
+Ne     1:14      120:39      5:45       23:24     10:16      239:21      9:02
+Pl    19:55       91:11      1:57       43:46      7:55      268:48     12:00
+X      1:41       32:26     10:51       81:10     20:00      327:20     18:19
+Y     20:08       92:55      2:06       42:29      7:59      267:01     11:50
+
+
+
+Move to another field, RETURN to change this field, ? for help, or q to run
+
+CDT 19:00:00  4/30/1990 | LST    8:19:50 | Lat   44:50:37 |      April 1990
+UTC  0:00:00  5/01/1990 |                | Long  93:42:08 | Su Mo Tu We Th Fr Sa
+JulianDat 2448012.50000 | Dawn      4:10 | Elev    800 ft |  1  2  3  4  5  6  7
+Watch                   | Dusk     22:15 | Temp      40 F |  8 FM 10 11 12 13 14
+Listing             off | NiteLn    5:55 | AtmPr 29.50 in | 15 16 17 18 19 20 21
+Search              off |                | TZ     5:00:00 | 22 23 NM 25 26 27 28
+Plot                off | NStep        1 | Epoch   2000.0 | 29 30
+Menu        Separations | StpSz RT CLOCK | Pause        0 |
+--------------------------------------------------------------------------------
+OCX Sun  Moon   Merc  Venus  Mars   Jup    Sat  Uranus  Nep  Pluto    X     Y
+Su        79:32   4:52 43:59  62:55 56:31   105:  121:   116:  163:  38:21  162:
+Mo  79:32        74:49  124:   142: 23:01   175:  160:   164:  106:  99:52  108:
+Me   4:52 74:49        48:43  67:39 51:50   110:  126:   121:  163:  39:57  163:
+Ve  43:59  124:  48:43        18:56  100:  61:09 77:00  71:58  129:  38:49  126:
+Ma  62:55  142:  67:39 18:56         119:  42:14 58:04  53:04  111:  50:48  108:
+Ju  56:31 23:01  51:50  100:   119:         162:  177:   172:  128:  80:40  130:
+Sa   105:  175:   110: 61:09  42:14  162:        15:52  10:50 69:37  83:36 67:17
+Ur   121:  160:   126: 77:00  58:04  177:  15:52         5:11 54:43  97:18 52:21
+Ne   116:  164:   121: 71:58  53:04  172:  10:50  5:11        59:06  92:24 56:46
+Pl   163:  106:   163:  129:   111:  128:  69:37 54:43  59:06         125:  2:22
+X   38:21 99:52  39:57 38:49  50:48 80:40  83:36 97:18  92:24  125:         124:
+Y    162:  108:   163:  126:   108:  130:  67:17 52:21  56:46  2:22   124:
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 30 -
+
+
+Move to another field, RETURN to change this field, ? for help, or q to run
+
+CDT 19:00:00  4/30/1990 | LST    8:19:50 | Lat   44:50:37 |      April 1990
+UTC  0:00:00  5/01/1990 |                | Long  93:42:08 | Su Mo Tu We Th Fr Sa
+JulianDat 2448012.50000 | Dawn      4:10 | Elev    800 ft |  1  2  3  4  5  6  7
+Watch                   | Dusk     22:15 | Temp      40 F |  8 FM 10 11 12 13 14
+Listing             off | NiteLn    5:55 | AtmPr 29.50 in | 15 16 17 18 19 20 21
+Search              off |                | TZ     5:00:00 | 22 23 NM 25 26 27 28
+Plot                off | NStep        1 | Epoch   2000.0 | 29 30
+Menu        Jupiter Aux | StpSz RT CLOCK | Pause        0 |
+--------------------------------------------------------------------------------
+
+     Central Meridian Longitude (degs):   337.545 (Sys I)  267.021 (Sys II)
+               (GRS is at approximately 30 degs in System II)
+
+                                        Jupiter Radii
+                            X (+E)         Y (+N)      Z (+towards)
+        I   Io               0.950         -0.181         -5.808
+        II  Europa          -4.052          0.261          8.384
+        III Ganymede        -8.502          0.385         12.350
+        IV  Callisto        26.029          0.160          5.119
+
+                           G     E     JI                                    C
+ West                                                                     East
+
+
+
+
+     New, Optional Features
+
+     16.  Watch Earth, Moon
+
+     If compiled with the GLOBE_PHOON option, the Watch menu will include two
+     new options, Earth and Moon.  Earth is a view of Earth, as seen from the
+     lighted (day) side, above the equator. Moon is a view of the Moon seen
+     from Earth. Both respond to ephem's current date/time. Earth will rotate,
+     and the Moon will show the current phase. 
+
+
+     17.  Colors
+
+     If compiled with the ANSI_COLORS option, colors will be applied. The
+     colors used are defaults, and may be set with the COLOR config and command
+     line setting. The COLOR command is of the following form:
+
+        COLOR=entity,c1,c2,c3
+     or,
+        COLOR=entity,c1,c2
+
+     where "entity" is one of:
+
+       alt_labels, alt_menu, borders, earth, globe, jupiter, listing_prstate, 
+       mars, mercury, mm_labels, moon, neptune, now, objx, objy, phoon, 
+       plot_prstate, pluto, saturn, srch_prstate, sun, twilight, uranus, venus,
+       version, watch
+    
+     and c1,c2,c3 are integers, corresponding to standard ANSI color codes:
+
+                 Esc [ c1 ; c2 ; c3 m
+     or,
+                 Esc [ c1 ; c2 m
+
+
+                                       - 31 -
+
+
+     The current (default) color settings are as follows,
+
+     COLOR=alt_labels,36,40,1
+     COLOR=alt_menu,30,42
+     COLOR=borders,30,46,5
+     COLOR=earth,32,44,1
+     COLOR=globe,32,1
+     COLOR=jupiter,31,46,7
+     COLOR=listing_prstate,33,44,1
+     COLOR=mars,31,43,7
+     COLOR=mercury,34,40,5
+     COLOR=mm_labels,30,42,7
+     COLOR=moon,30,40,5
+     COLOR=neptune,31,46,5
+     COLOR=now,32,42,7
+     COLOR=objx,30,42
+     COLOR=objy,32,40
+     COLOR=phoon,30,40,5
+     COLOR=plot_prstate,33,44,1
+     COLOR=pluto,37,40,7
+     COLOR=saturn,30,43,7
+     COLOR=srch_prstate,33,44,1
+     COLOR=sun,30,43,5
+     COLOR=twilight,30,40,1
+     COLOR=uranus,36,44,7
+     COLOR=venus,30,46,5
+     COLOR=version,33,1
+     COLOR=watch,30,43,7
+
+     Additionally, colors may be enabled or disabled with the enable_colors
+     setting. For example to disable colors,
+
+     ENABLE_COLORS=0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

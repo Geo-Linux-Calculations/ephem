@@ -1,0 +1,58 @@
+Files shipped as the ephem package:
+
+CMakeLists.txt just say "make" ...
+Man.txt		manual, ready for a very generic printer.
+Manifest	this file.
+Readme		check here for hints before building.
+ephem.cfg	sample configuration file. you'll want to edit this for your
+		particular location and interests after reading the manual.
+ephem.db	sample database file. ditto.
+
+The source files:
+aa_hadec.c	convert between alt/az and hour angle/dec.
+altj.c		manage and compute jupiter info menu.
+altmenus.c	draws the three alternate lower screens.
+anomaly.c	compute anomaly.
+astro.h		unit conversion macros and planet defines.
+cal_mjd.c	converters to and from modified julian date.
+circum.c	main "astronomy" entry point that finds where anything is.
+circum.h	defines Now and Sky structures.
+comet.c		compute comet position from elements.
+compiler.c	compile and execute general expressions with screen fields.
+constel.c	handles determing and printing constellation info.
+eq_ecl.c	convert between equitorial and eclipitic coords.
+ephem.sh.in	ephem wrapper shell script to install (for -h)
+flog.c		logs and retrieves screen locations for logging purposes.
+formats.c	basic date, time, prompts, etc formats.
+globe.c		ASCII earth drawing, data
+io.c		basic cursor and screen io control.
+listing.c	set fields for and manage listings.
+main.c		main loop.
+mainmenu.c	draws the top screen.
+moon.c		compute moon position.
+moonnf.c	compute new and full moon dates.
+nutation.c	compute nutation correction.
+objx.c		set and make use of all the object-x info.
+obliq.c		compute obliquity.
+parallax.c	functions to compute earth rim parallax correction.
+pelement.c	basic planet position polynomial coefficients.
+phoon.c		ASCII moon drawing, data
+phoonastro.c	ASCII moon calculations, conversions
+phoonastro.h	ASCII moon defines, conversions
+plans.c		use polynomials to find planet location at any certain time.
+plot.c		set fields for and manage plots.
+popup.c		handle the one-liner "popup" menus at the top of the screen.
+precess.c	compute precession correction.
+reduce.c	convert elliptical elements from one epoch to another.
+refract.c	atmospheric refraction model.
+riset.c		find basic rise/set sideral times of a fixed object.
+riset_c.c	iteratively solve for local rise/set times of moving objects.
+screen.h	define all field locations and codes, extra planet codes.
+sel_fld.c	handle cursor movement commands in the various screens.
+sex_dec.c	convert between sexagesimal and decimal notation.
+srch.c		set and manage the various search functions.
+sun.c		compute location of sun at any time.
+time.c		manage setting and getting the time from the os.
+utc_gst.c	convert between UT1 and Greenwich sidereal time.
+version.c	current version notice, and revision history comments.
+watch.c		manage the screen during sky and solar system displays.
