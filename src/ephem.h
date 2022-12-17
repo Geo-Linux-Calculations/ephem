@@ -50,7 +50,7 @@ void rnd_second(double *);
 
 /* From comet.c */
 void comet(double, double, double, double, double, double,
-  double *, double *, double *, double *, double *, double *);
+           double *, double *, double *, double *, double *, double *);
 
 /* From compiler.c */
 int prog_isgood();
@@ -142,8 +142,8 @@ void obliquity (double, double *);
 void obj_setup(int);
 int obj_ison(int);
 void obj_setdbfilename(char *);
-void obj_cir(double, int, double *, double *, double *, double *, double *, 
-  double *, double *, double *);
+void obj_cir(double, int, double *, double *, double *, double *, double *,
+             double *, double *, double *);
 void obj_on(int);
 int obj_define(int, char *);
 int obj_filelookup(int, char *);
@@ -155,8 +155,8 @@ void ta_par(double, double, double, double, double, double *, double *);
 void pelement(double, double[8][9]);
 
 /* From plans.c */
-void plans(double, int, double *, double *, double *, double *, double *, 
-  double *, double *, double *);
+void plans(double, int, double *, double *, double *, double *, double *,
+           double *, double *, double *);
 
 /* From plot.c */
 void plot_setup();
@@ -172,7 +172,7 @@ void precess(double, double, double *, double *);
 
 /* From reduce.c */
 void reduce_elements(double, double, double, double, double, double *,
-  double *, double *);
+                     double *, double *);
 
 /* From refract.c */
 void refract(double, double, double, double *);
@@ -180,12 +180,12 @@ void unrefract(double, double, double, double *);
 
 /* From riset.c */
 void riset(double, double, double, double, double *, double *, double *,
-  double *, int *);
+           double *, int *);
 
 /* From riset_c.c */
 #ifdef _CIRCUM_H
-int riset_cir(int, Now *, int, int, double *, double *, double *, double *, 
-  double *, double *, int *);
+int riset_cir(int, Now *, int, int, double *, double *, double *, double *,
+              double *, double *, int *);
 #endif
 
 /* From sel_fld.c */

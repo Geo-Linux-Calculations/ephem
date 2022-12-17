@@ -15,37 +15,39 @@
 #define	TWILIGHT	2	/* rise/set times for sun 18 degs below hor */
 
 /* info about our local observing circumstances */
-typedef struct {
-	double n_mjd;	/* modified Julian date, ie, days since
+typedef struct
+{
+    double n_mjd;	/* modified Julian date, ie, days since
 			 * Jan 0.5 1900 (== 12 noon, Dec 30, 1899), utc.
 			 * enough precision to get well better than 1 second.
 			 * N.B. if not first member, must move NOMJD inits.
 			 */
-	double n_lat;	/* latitude, >0 north, rads */
-	double n_lng;	/* longitude, >0 east, rads */
-	double n_tz;	/* time zone, hrs behind UTC */
-	double n_temp;	/* atmospheric temp, degrees C */
-	double n_pressure; /* atmospheric pressure, mBar */
-	double n_height;	/* height above sea level, earth radii */
-	double n_epoch;	/* desired precession display epoch as an mjd, or EOD */
-	char n_tznm[4];	/* time zone name; 3 chars or less, always 0 at end */
+    double n_lat;	/* latitude, >0 north, rads */
+    double n_lng;	/* longitude, >0 east, rads */
+    double n_tz;	/* time zone, hrs behind UTC */
+    double n_temp;	/* atmospheric temp, degrees C */
+    double n_pressure; /* atmospheric pressure, mBar */
+    double n_height;	/* height above sea level, earth radii */
+    double n_epoch;	/* desired precession display epoch as an mjd, or EOD */
+    char n_tznm[4];	/* time zone name; 3 chars or less, always 0 at end */
 } Now;
 extern double	mjd_day(), mjd_hr();
 
 /* info about where and how we see something in the sky */
-typedef struct {
-	double s_ra;	/* ra, rads (precessed to n_epoch) */
-	double s_dec;	/* dec, rads (precessed to n_epoch) */
-	double s_az;	/* azimuth, >0 e of n, rads */
-	double s_alt;	/* altitude above topocentric horizon, rads */
-	double s_sdist;	/* dist from object to sun, au */
-	double s_edist;	/* dist from object to earth, au */
-	double s_elong;	/* angular sep between object and sun, >0 if east */
-	double s_hlong;	/* heliocentric longitude, rads */
-	double s_hlat;	/* heliocentric latitude, rads */
-	double s_size;	/* angular size, arc secs */
-	double s_phase;	/* phase, % */
-	double s_mag;	/* visual magnitude */
+typedef struct
+{
+    double s_ra;	/* ra, rads (precessed to n_epoch) */
+    double s_dec;	/* dec, rads (precessed to n_epoch) */
+    double s_az;	/* azimuth, >0 e of n, rads */
+    double s_alt;	/* altitude above topocentric horizon, rads */
+    double s_sdist;	/* dist from object to sun, au */
+    double s_edist;	/* dist from object to earth, au */
+    double s_elong;	/* angular sep between object and sun, >0 if east */
+    double s_hlong;	/* heliocentric longitude, rads */
+    double s_hlat;	/* heliocentric latitude, rads */
+    double s_size;	/* angular size, arc secs */
+    double s_phase;	/* phase, % */
+    double s_mag;	/* visual magnitude */
 } Sky;
 
 /* flags for riset_cir() status */

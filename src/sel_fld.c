@@ -10,20 +10,22 @@
 #define	BANG
 
 #ifndef NCURSES_LARGE
- /* if we're NOT using the NCURSES_LARGE option,
-  * we can use static initializers ... */
- F_t fields[] = {
- #define _RCFPAK(r,c,f) rcfpack(r,c,f)
+/* if we're NOT using the NCURSES_LARGE option,
+ * we can use static initializers ... */
+F_t fields[] =
+{
+#define _RCFPAK(r,c,f) rcfpack(r,c,f)
 #else
- /* we ARE using NCURSES_LARGE option, so define an _init_fields() function
-  * to initialize fields[] because NC and NR are no longer constant ...
-  * and be sure to run _init_fields() each time the terminal resizes.
-  */
- #define MAXFIELDS 1000
- int NFIELDS = 0;
- F_t fields[MAXFIELDS];
- #define _RCFPAK(r,c,f) (fields[NFIELDS++]=rcfpack(r,c,f))
- void _init_fields() {
+/* we ARE using NCURSES_LARGE option, so define an _init_fields() function
+ * to initialize fields[] because NC and NR are no longer constant ...
+ * and be sure to run _init_fields() each time the terminal resizes.
+ */
+#define MAXFIELDS 1000
+int NFIELDS = 0;
+F_t fields[MAXFIELDS];
+#define _RCFPAK(r,c,f) (fields[NFIELDS++]=rcfpack(r,c,f))
+void _init_fields()
+{
     NFIELDS = 0;
 #endif
     _RCFPAK (R_ALTM,	C_ALTM,		F_MMNU|F_CHG),
@@ -511,7 +513,7 @@ static void move_cur (int dirchar, int flag, int *rp, int *cp);
 static int nearestfld (int r, int c, int flag);
 
 /* let op select a field by moving around and hitting RETURN or SPACE, or
- *   until see END. also allow moving directly to frequently used fields 
+ *   until see END. also allow moving directly to frequently used fields
  *   with some hot-keys.
  * only allow fields with the given flag mask.
  * return the rcfpack()'d field, or 0 if typed END.
@@ -522,69 +524,75 @@ int f;		/* inital row, col */
 int flag;
 char *prmpt, *help;
 {
-	extern void bye();
-	int r = unpackr(f), c = unpackc(f);
-	char *lastp;
-	int ch;
+    extern void bye();
+    int r = unpackr(f), c = unpackc(f);
+    char *lastp;
+    int ch;
 
-	lastp = 0;
-	while (1) {
-	    if (lastp != prmpt) {
-		lastp = prmpt;
-		f_prompt (lastp);
-	    }
-	    c_pos (r, c);
-	    switch (ch = read_char()) {
-	    case REDRAW:
-		redraw_screen(2);	/* redraw all from scratch */
-		lastp = 0;
-		break;
-	    case VERSION:
-		version();
-		lastp = 0;
-		break;
-	    case HELP:
-		f_msg (help);
-		lastp = 0;
-		break;
-	    case QUIT:
-		f_prompt ("Exit ephem? (y) ");
-		if (read_char() == 'y')
-		    bye();	/* never returns */
-		lastp = 0;
-		break;
+    lastp = 0;
+    while (1)
+    {
+        if (lastp != prmpt)
+        {
+            lastp = prmpt;
+            f_prompt (lastp);
+        }
+        c_pos (r, c);
+        switch (ch = read_char())
+        {
+        case REDRAW:
+            redraw_screen(2);	/* redraw all from scratch */
+            lastp = 0;
+            break;
+        case VERSION:
+            version();
+            lastp = 0;
+            break;
+        case HELP:
+            f_msg (help);
+            lastp = 0;
+            break;
+        case QUIT:
+            f_prompt ("Exit ephem? (y) ");
+            if (read_char() == 'y')
+                bye();	/* never returns */
+            lastp = 0;
+            break;
 #ifdef BANG
-	    case '!': {
-		char buf[NC];
-		f_prompt ("!");
-		if (read_line (buf, sizeof(buf)-2) > 0) {
-		    c_erase();
-		    byetty();
+        case '!':
+        {
+            char buf[NC];
+            f_prompt ("!");
+            if (read_line (buf, sizeof(buf)-2) > 0)
+            {
+                c_erase();
+                byetty();
 #ifdef CURSES
-            endwin();
+                endwin();
 #endif
-		    int sys_rv = system (buf);
-		    printf ("\n exit code = %d [Hit any key to resume ephem...]",sys_rv);
-		    (void) read_char();
+                int sys_rv = system (buf);
+                printf ("\n exit code = %d [Hit any key to resume ephem...]",sys_rv);
+                (void) read_char();
 #ifdef CURSES
-            refresh();
-            keypad(stdscr,TRUE);
+                refresh();
+                keypad(stdscr,TRUE);
 #endif
-		    redraw_screen(2);	/* redraw all from scratch */
-		}
-		lastp = 0;
-		}
-		break;
+                redraw_screen(2);	/* redraw all from scratch */
+            }
+            lastp = 0;
+        }
+        break;
 #endif
-	    case END:
-		return (0);
-	    case '\r': case ' ':
-		return (rcfpack (r, c, 0));
-	    default:
-		move_cur (ch, flag, &r, &c);
-		break;
-	    }
-	}
+        case END:
+            return (0);
+        case '\r':
+        case ' ':
+            return (rcfpack (r, c, 0));
+        default:
+            move_cur (ch, flag, &r, &c);
+            break;
+        }
+    }
 }
 
 /* move cursor to next field in given direction: hjkl, or directly to a
@@ -597,128 +605,186 @@ int dirchar;
 int flag;
 int *rp, *cp;
 {
-	int curr = *rp, curc = *cp;
-	F_t f, newf, *fp;
-	int d, newd;
+    int curr = *rp, curc = *cp;
+    F_t f, newf, *fp;
+    int d, newd;
 
-    wrapped:
-	newf = 0;
-	newd = 1000;
+wrapped:
+    newf = 0;
+    newd = 1000;
 
-	switch (dirchar) {
-	case 'h': /* left */
-	    /* go to next field to the left, or wrap.  */
-	    for (fp = fields+NFIELDS; --fp >= fields; ) {
-		f = *fp;
-		if (tstpackf(f,flag) && unpackr(f) == curr) {
-		    d = curc - unpackc(f);
-		    if (d > 0 && d < newd) {
-			newf = f;
-			newd = d;
-		    }
-		}
-	    }
-	    if (!newf) {
-		curc = NC;
-		goto wrapped;
-	    }
-	    break;
+    switch (dirchar)
+    {
+    case 'h': /* left */
+        /* go to next field to the left, or wrap.  */
+        for (fp = fields+NFIELDS; --fp >= fields; )
+        {
+            f = *fp;
+            if (tstpackf(f,flag) && unpackr(f) == curr)
+            {
+                d = curc - unpackc(f);
+                if (d > 0 && d < newd)
+                {
+                    newf = f;
+                    newd = d;
+                }
+            }
+        }
+        if (!newf)
+        {
+            curc = NC;
+            goto wrapped;
+        }
+        break;
 
-	case 'j': /* down */
-	    /* go to closest field on next row down with anything on it,
-	     * or wrap.
-	     */
-	    for (fp = fields+NFIELDS; --fp >= fields; ) {
-		f = *fp;
-		if (tstpackf(f,flag)) {
-		    d = unpackr(f) - curr;
-		    if (d > 0 && d < newd) {
-			newf = f;
-			newd = d;
-		    }
-		}
-	    }
-	    if (newf) {
-		/* now find the field closest to current col on that row */
-		newf = nearestfld (unpackr(newf), curc, flag);
-	    } else {
-		curr = 0;
-		goto wrapped;
-	    }
-	    break;
+    case 'j': /* down */
+        /* go to closest field on next row down with anything on it,
+         * or wrap.
+         */
+        for (fp = fields+NFIELDS; --fp >= fields; )
+        {
+            f = *fp;
+            if (tstpackf(f,flag))
+            {
+                d = unpackr(f) - curr;
+                if (d > 0 && d < newd)
+                {
+                    newf = f;
+                    newd = d;
+                }
+            }
+        }
+        if (newf)
+        {
+            /* now find the field closest to current col on that row */
+            newf = nearestfld (unpackr(newf), curc, flag);
+        }
+        else
+        {
+            curr = 0;
+            goto wrapped;
+        }
+        break;
 
-	case 'k': /* up */
-	    /* go to closest field on next row up with anything on it, 
-	     * or wrap.
-	     */
-	    for (fp = fields+NFIELDS; --fp >= fields; ) {
-		f = *fp;
-		if (tstpackf(f,flag)) {
-		    d = curr - unpackr(f);
-		    if (d > 0 && d < newd) {
-			newf = f;
-			newd = d;
-		    }
-		}
-	    }
-	    if (newf) {
-		/* now find the field closest to current col on that row */
-		newf = nearestfld (unpackr(newf), curc, flag);
-	    } else {
-		curr = NR+1;
-		goto wrapped;
-	    }
-	    break;
+    case 'k': /* up */
+        /* go to closest field on next row up with anything on it,
+         * or wrap.
+         */
+        for (fp = fields+NFIELDS; --fp >= fields; )
+        {
+            f = *fp;
+            if (tstpackf(f,flag))
+            {
+                d = curr - unpackr(f);
+                if (d > 0 && d < newd)
+                {
+                    newf = f;
+                    newd = d;
+                }
+            }
+        }
+        if (newf)
+        {
+            /* now find the field closest to current col on that row */
+            newf = nearestfld (unpackr(newf), curc, flag);
+        }
+        else
+        {
+            curr = NR+1;
+            goto wrapped;
+        }
+        break;
 
-	case 'l': /* right */
-	    /* go to next field to the right, or wrap.  */
-	    for (fp = fields+NFIELDS; --fp >= fields; ) {
-		f = *fp;
-		if (tstpackf(f,flag) && unpackr(f) == curr) {
-		    d = unpackc(f) - curc;
-		    if (d > 0 && d < newd) {
-			newf = f;
-			newd = d;
-		    }
-		}
-	    }
-	    if (!newf) {
-		curc = 0;
-		goto wrapped;
-	    }
-	    break;
+    case 'l': /* right */
+        /* go to next field to the right, or wrap.  */
+        for (fp = fields+NFIELDS; --fp >= fields; )
+        {
+            f = *fp;
+            if (tstpackf(f,flag) && unpackr(f) == curr)
+            {
+                d = unpackc(f) - curc;
+                if (d > 0 && d < newd)
+                {
+                    newf = f;
+                    newd = d;
+                }
+            }
+        }
+        if (!newf)
+        {
+            curc = 0;
+            goto wrapped;
+        }
+        break;
 
-	/* handy shorthands directly to a given spot.
-	 * calling nearestfld() automatically allows for which menu
-	 *   is up now and what is pickable. you can use rcfpack()
-	 *   directly for top half fields that are always up.
-	 * N.B. using nearestfld() can be too aggressive. it will try
-	 *   other fields entirely if one you intend is not eligible.
-	 */
-	case 'S': newf = nearestfld (R_SUN, C_OBJ, flag); break;
-	case 'M': newf = nearestfld (R_MOON, C_OBJ, flag); break;
-	case 'e': newf = nearestfld (R_MERCURY, C_OBJ, flag); break;
-	case 'v': newf = nearestfld (R_VENUS, C_OBJ, flag); break;
-	case 'm': newf = nearestfld (R_MARS, C_OBJ, flag); break;
-	case 'J': newf = nearestfld (R_JUPITER, C_OBJ, flag); break;
-	case 's': newf = nearestfld (R_SATURN, C_OBJ, flag); break;
-	case 'u': newf = nearestfld (R_URANUS, C_OBJ, flag); break;
-	case 'n': newf = nearestfld (R_NEPTUNE, C_OBJ, flag); break;
-	case 'p': newf = nearestfld (R_PLUTO, C_OBJ, flag); break;
-	case 'x': newf = nearestfld (R_OBJX, C_OBJ, flag); break;
-	case 'y': newf = nearestfld (R_OBJY, C_OBJ, flag); break;
-	case 'c': newf = nearestfld (R_ALTM, C_ALTM, flag); break;
-	case 'd': newf = nearestfld (R_UD, C_UD, flag); break;
-	case 'o': newf = nearestfld (R_EPOCH, C_EPOCHV, flag); break;
-	case 'z': newf = nearestfld (R_STPSZ, C_STPSZV, flag); break;
-	case 'w': newf = nearestfld (R_WATCH, C_WATCH, flag); break;
-	case 'L': newf = nearestfld (R_LISTING, C_LISTING, flag); break;
-	}
+    /* handy shorthands directly to a given spot.
+     * calling nearestfld() automatically allows for which menu
+     *   is up now and what is pickable. you can use rcfpack()
+     *   directly for top half fields that are always up.
+     * N.B. using nearestfld() can be too aggressive. it will try
+     *   other fields entirely if one you intend is not eligible.
+     */
+    case 'S':
+        newf = nearestfld (R_SUN, C_OBJ, flag);
+        break;
+    case 'M':
+        newf = nearestfld (R_MOON, C_OBJ, flag);
+        break;
+    case 'e':
+        newf = nearestfld (R_MERCURY, C_OBJ, flag);
+        break;
+    case 'v':
+        newf = nearestfld (R_VENUS, C_OBJ, flag);
+        break;
+    case 'm':
+        newf = nearestfld (R_MARS, C_OBJ, flag);
+        break;
+    case 'J':
+        newf = nearestfld (R_JUPITER, C_OBJ, flag);
+        break;
+    case 's':
+        newf = nearestfld (R_SATURN, C_OBJ, flag);
+        break;
+    case 'u':
+        newf = nearestfld (R_URANUS, C_OBJ, flag);
+        break;
+    case 'n':
+        newf = nearestfld (R_NEPTUNE, C_OBJ, flag);
+        break;
+    case 'p':
+        newf = nearestfld (R_PLUTO, C_OBJ, flag);
+        break;
+    case 'x':
+        newf = nearestfld (R_OBJX, C_OBJ, flag);
+        break;
+    case 'y':
+        newf = nearestfld (R_OBJY, C_OBJ, flag);
+        break;
+    case 'c':
+        newf = nearestfld (R_ALTM, C_ALTM, flag);
+        break;
+    case 'd':
+        newf = nearestfld (R_UD, C_UD, flag);
+        break;
+    case 'o':
+        newf = nearestfld (R_EPOCH, C_EPOCHV, flag);
+        break;
+    case 'z':
+        newf = nearestfld (R_STPSZ, C_STPSZV, flag);
+        break;
+    case 'w':
+        newf = nearestfld (R_WATCH, C_WATCH, flag);
+        break;
+    case 'L':
+        newf = nearestfld (R_LISTING, C_LISTING, flag);
+        break;
+    }
 
-	if (newf) {
-	    *rp = unpackr(newf);
-	    *cp = unpackc(newf);
-	}
+    if (newf)
+    {
+        *rp = unpackr(newf);
+        *cp = unpackc(newf);
+    }
 }
 
 /* return the nearest field with given flag mask, either way, on this row,
@@ -728,23 +794,26 @@ static int
 nearestfld (r, c, flag)
 int r, c, flag;
 {
-	F_t nf, f, *fp;
-	int d, d0;
+    F_t nf, f, *fp;
+    int d, d0;
 
-	nf = 0;
-	d0 = 1000;
+    nf = 0;
+    d0 = 1000;
 
-	for (fp = fields+NFIELDS; --fp >= fields; ) {
-	    f = *fp;
-	    if (tstpackf(f,flag) && unpackr(f) == r) {
-		d = abs(c - unpackc(f));
-		if (d < d0) {
-		    nf = f;
-		    d0 = d;
-		}
-	    }
-	}
-	return (nf);
+    for (fp = fields+NFIELDS; --fp >= fields; )
+    {
+        f = *fp;
+        if (tstpackf(f,flag) && unpackr(f) == r)
+        {
+            d = abs(c - unpackc(f));
+            if (d < d0)
+            {
+                nf = f;
+                d0 = d;
+            }
+        }
+    }
+    return (nf);
 }
 
 #ifdef ANSI_COLORS
@@ -753,61 +822,61 @@ int Colors_Enabled = 1;
 
 void init_app_colors()
 {
-	App_Colors = (APP_COLOR *)malloc(sizeof(APP_COLOR) * N_COLORS);
+    App_Colors = (APP_COLOR *)malloc(sizeof(APP_COLOR) * N_COLORS);
 #define _DEF_COLOR(d,n,x,y,z) \
 	App_Colors[d].name = (char *)n; \
 	App_Colors[d].c1= x; \
 	App_Colors[d].c2= y; \
-	App_Colors[d].c3= z; 
-	_DEF_COLOR( COLOR_VERSION,	"version", 1, 40, 93);
-	_DEF_COLOR( COLOR_WATCH,	"watch", 0, 49, 93)
-	_DEF_COLOR( COLOR_BORDERS,	"borders",30,46,0);
-	_DEF_COLOR( COLOR_MM_LABELS,	"mm_labels",1,40,32);
-	_DEF_COLOR( COLOR_SRCH_PRSTATE,	"srch_prstate",33,44,0);
-	_DEF_COLOR( COLOR_PLOT_PRSTATE,	"plot_prstate",33,44,0);
-	_DEF_COLOR( COLOR_LISTING_PRSTATE,"listing_prstate",33,44,0);
-	_DEF_COLOR( COLOR_NOW,		"now",7,0,0);
-	_DEF_COLOR( COLOR_TWILIGHT,	"twilight",0,49,37);
-	_DEF_COLOR( COLOR_ALT_LABELS,	"alt_labels",36,40,0);
-	_DEF_COLOR( COLOR_PHOON,	"phoon",7,40,90);
-	_DEF_COLOR( COLOR_GLOBE,	"globe",32,1,0);
-	_DEF_COLOR( COLOR_ALT_MENU,	"alt_menu",30,42,0);
-	_DEF_COLOR( COLOR_SUN,		"sun", 7,49,93);
-	_DEF_COLOR( COLOR_MOON,		"moon", 7,40,90);
-	_DEF_COLOR( COLOR_MERCURY,	"mercury", 7,101,97);
-	_DEF_COLOR( COLOR_VENUS,	"venus", 30,46,0);
-	_DEF_COLOR( COLOR_MARS,		"mars",	5,101,93);
-	_DEF_COLOR( COLOR_JUPITER,	"jupiter", 1,41,39);
-	_DEF_COLOR( COLOR_SATURN,	"saturn", 44,22,0);
-	_DEF_COLOR( COLOR_URANUS,	"uranus", 36,44,0);
-	_DEF_COLOR( COLOR_NEPTUNE,	"neptune", 31,46,0);
-	_DEF_COLOR( COLOR_PLUTO,	"pluto", 37,40,0);
-	_DEF_COLOR( COLOR_OBJX,		"objx",	30,42,0);
-	_DEF_COLOR( COLOR_OBJY,		"objy",	30,42,0);
-	_DEF_COLOR( COLOR_EARTH,	"earth",32,0,0);
+	App_Colors[d].c3= z;
+    _DEF_COLOR( COLOR_VERSION,	"version", 1, 40, 93);
+    _DEF_COLOR( COLOR_WATCH,	"watch", 0, 49, 93)
+    _DEF_COLOR( COLOR_BORDERS,	"borders",30,46,0);
+    _DEF_COLOR( COLOR_MM_LABELS,	"mm_labels",1,40,32);
+    _DEF_COLOR( COLOR_SRCH_PRSTATE,	"srch_prstate",33,44,0);
+    _DEF_COLOR( COLOR_PLOT_PRSTATE,	"plot_prstate",33,44,0);
+    _DEF_COLOR( COLOR_LISTING_PRSTATE,"listing_prstate",33,44,0);
+    _DEF_COLOR( COLOR_NOW,		"now",7,0,0);
+    _DEF_COLOR( COLOR_TWILIGHT,	"twilight",0,49,37);
+    _DEF_COLOR( COLOR_ALT_LABELS,	"alt_labels",36,40,0);
+    _DEF_COLOR( COLOR_PHOON,	"phoon",7,40,90);
+    _DEF_COLOR( COLOR_GLOBE,	"globe",32,1,0);
+    _DEF_COLOR( COLOR_ALT_MENU,	"alt_menu",30,42,0);
+    _DEF_COLOR( COLOR_SUN,		"sun", 7,49,93);
+    _DEF_COLOR( COLOR_MOON,		"moon", 7,40,90);
+    _DEF_COLOR( COLOR_MERCURY,	"mercury", 7,101,97);
+    _DEF_COLOR( COLOR_VENUS,	"venus", 30,46,0);
+    _DEF_COLOR( COLOR_MARS,		"mars",	5,101,93);
+    _DEF_COLOR( COLOR_JUPITER,	"jupiter", 1,41,39);
+    _DEF_COLOR( COLOR_SATURN,	"saturn", 44,22,0);
+    _DEF_COLOR( COLOR_URANUS,	"uranus", 36,44,0);
+    _DEF_COLOR( COLOR_NEPTUNE,	"neptune", 31,46,0);
+    _DEF_COLOR( COLOR_PLUTO,	"pluto", 37,40,0);
+    _DEF_COLOR( COLOR_OBJX,		"objx",	30,42,0);
+    _DEF_COLOR( COLOR_OBJY,		"objy",	30,42,0);
+    _DEF_COLOR( COLOR_EARTH,	"earth",32,0,0);
 }
 
 void app_color( app_color_code )
-int app_color_code; /* a COLOR_* index into App_Colors[] */ 
+int app_color_code; /* a COLOR_* index into App_Colors[] */
 {
-    if ( Colors_Enabled ) {
-	if ( app_color_code >= 0 
-		&& app_color_code < N_COLORS )
-	{
-		if ( App_Colors[app_color_code].c3 != 0 )
-			fprintf(stdout,"\033[%d;%d;%dm",
-				App_Colors[app_color_code].c1,
-				App_Colors[app_color_code].c2,
-				App_Colors[app_color_code].c3 );
-		else
-		if ( App_Colors[app_color_code].c2 != 0 )
-			fprintf(stdout,"\033[%d;%dm",
-				App_Colors[app_color_code].c1,
-				App_Colors[app_color_code].c2 );
-		else
-			fprintf(stdout,"\033[%dm",
-				App_Colors[app_color_code].c1 );
-	}
+    if ( Colors_Enabled )
+    {
+        if ( app_color_code >= 0
+                && app_color_code < N_COLORS )
+        {
+            if ( App_Colors[app_color_code].c3 != 0 )
+                fprintf(stdout,"\033[%d;%d;%dm",
+                        App_Colors[app_color_code].c1,
+                        App_Colors[app_color_code].c2,
+                        App_Colors[app_color_code].c3 );
+            else if ( App_Colors[app_color_code].c2 != 0 )
+                fprintf(stdout,"\033[%d;%dm",
+                        App_Colors[app_color_code].c1,
+                        App_Colors[app_color_code].c2 );
+            else
+                fprintf(stdout,"\033[%dm",
+                        App_Colors[app_color_code].c1 );
+        }
     }
 }
 
@@ -841,54 +910,59 @@ int app_color_code; /* a COLOR_* index into App_Colors[] */
 int set_app_color( s )
 char *s;
 {
-	/* s to lower case ==> buf[] */
-	char buf[128];
-	char *c = s;
-	char *o = &buf[0];
-	int l = 0;
-	for(; l<128 && *c != '\0'; c++,l++) {
-		*o = isupper(*c) ? tolower(*c) : *c;
-		o++;
-	}
-	*o = '\0';
+    /* s to lower case ==> buf[] */
+    char buf[128];
+    char *c = s;
+    char *o = &buf[0];
+    int l = 0;
+    for(; l<128 && *c != '\0'; c++,l++)
+    {
+        *o = isupper(*c) ? tolower(*c) : *c;
+        o++;
+    }
+    *o = '\0';
 
-	/* parse color enable/disable command */
-	if ( sscanf( buf,"enable_colors=%d", &Colors_Enabled )==1 )
-		return APP_COLOR_CMD;
+    /* parse color enable/disable command */
+    if ( sscanf( buf,"enable_colors=%d", &Colors_Enabled )==1 )
+        return APP_COLOR_CMD;
 
 
-	/* parse define app color command */
-	char name[32];
-	int c1=0,c2=0,c3=0;
-	int scanned_ok = 0;
-	if ( sscanf( buf,"color=%[^,],%d,%d,%d", name, &c1,&c2,&c3) == 4 ) {
-		scanned_ok = 1;
-	}
-	else
-	if ( sscanf( buf,"color=%[^,],%d,%d", name, &c1,&c2) == 3 ) {
-		scanned_ok = 1;
-	}
-	if ( scanned_ok != 0 ) { /* parsed? */
+    /* parse define app color command */
+    char name[32];
+    int c1=0,c2=0,c3=0;
+    int scanned_ok = 0;
+    if ( sscanf( buf,"color=%[^,],%d,%d,%d", name, &c1,&c2,&c3) == 4 )
+    {
+        scanned_ok = 1;
+    }
+    else if ( sscanf( buf,"color=%[^,],%d,%d", name, &c1,&c2) == 3 )
+    {
+        scanned_ok = 1;
+    }
+    if ( scanned_ok != 0 )   /* parsed? */
+    {
 
-		/* known entity? */
-		int i;
-		for(i=0; i<N_COLORS; i++ ) {
-			if (strcmp(App_Colors[i].name, name) == 0)
-			{
-				App_Colors[i].c1 = c1;
-				App_Colors[i].c2 = c2;
-				App_Colors[i].c3 = c3;
-				/* parsed, recognized entity, set color: */
-				return i;
-			}
-		}
-	}
-	return -1;  /* didn't parse / recognize that entity */
+        /* known entity? */
+        int i;
+        for(i=0; i<N_COLORS; i++ )
+        {
+            if (strcmp(App_Colors[i].name, name) == 0)
+            {
+                App_Colors[i].c1 = c1;
+                App_Colors[i].c2 = c2;
+                App_Colors[i].c3 = c3;
+                /* parsed, recognized entity, set color: */
+                return i;
+            }
+        }
+    }
+    return -1;  /* didn't parse / recognize that entity */
 }
 #else
 int set_app_color( s )
 char *s;
-{ /* NOP if ANSI_COLORS isn't defined */
-   return(0);
+{
+    /* NOP if ANSI_COLORS isn't defined */
+    return(0);
 }
 #endif /* ANSI_COLORS */

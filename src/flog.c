@@ -23,11 +23,12 @@
 				 * fields
 				 */
 
-typedef struct {
-	int fl_usagecnt;	/* number of "users" logging to this field */
-	int fl_fld;		/* an rcfpack(r,c,0) */
-	double fl_val;		/* stored value as a double */
-	char fl_str[16];	/* stored value as a formatted string.
+typedef struct
+{
+    int fl_usagecnt;	/* number of "users" logging to this field */
+    int fl_fld;		/* an rcfpack(r,c,0) */
+    double fl_val;		/* stored value as a double */
+    char fl_str[16];	/* stored value as a formatted string.
 				 * N.B.: never overwrite last char: keep as \0
 				 */
 } FLog;
@@ -40,24 +41,29 @@ static FLog flog[NFLOGS];
 int flog_add (fld)
 int fld;
 {
-	FLog *flp, *unusedflp = 0;
+    FLog *flp, *unusedflp = 0;
 
-	/* scan for fld already in list, or find an unused one along the way */
-	for (flp = &flog[NFLOGS]; --flp >= flog; ) {
-	    if (flp->fl_usagecnt > 0) {
-		if (flp->fl_fld == fld) {
-		    flp->fl_usagecnt++;
-		    return (0);
-		}
-	    } else
-		unusedflp = flp;
-	}
-	if (unusedflp) {
-	    unusedflp->fl_fld = fld;
-	    unusedflp->fl_usagecnt = 1;
-	    return (0);
-	}
-	return (-1);
+    /* scan for fld already in list, or find an unused one along the way */
+    for (flp = &flog[NFLOGS]; --flp >= flog; )
+    {
+        if (flp->fl_usagecnt > 0)
+        {
+            if (flp->fl_fld == fld)
+            {
+                flp->fl_usagecnt++;
+                return (0);
+            }
+        }
+        else
+            unusedflp = flp;
+    }
+    if (unusedflp)
+    {
+        unusedflp->fl_fld = fld;
+        unusedflp->fl_usagecnt = 1;
+        return (0);
+    }
+    return (-1);
 }
 
 /* decrement usage count for flog for fld. if goes to 0 take it out of list.
@@ -66,15 +72,17 @@ int fld;
 void flog_delete (fld)
 int fld;
 {
-	FLog *flp;
+    FLog *flp;
 
-	for (flp = &flog[NFLOGS]; --flp >= flog; )
-	    if (flp->fl_fld == fld && flp->fl_usagecnt > 0) {
-		if (--flp->fl_usagecnt <= 0) {
-		    flp->fl_usagecnt = 0;
-		}
-		break;
-	    }
+    for (flp = &flog[NFLOGS]; --flp >= flog; )
+        if (flp->fl_fld == fld && flp->fl_usagecnt > 0)
+        {
+            if (--flp->fl_usagecnt <= 0)
+            {
+                flp->fl_usagecnt = 0;
+            }
+            break;
+        }
 }
 
 /* if plotting, listing or searching is active then
@@ -86,18 +94,21 @@ int r, c;
 double val;
 char *str;
 {
-	if (plot_ison() || listing_ison() || srch_ison()) {
-	    FLog *flp;
-	    int fld = rcfpack (r, c, 0);
-	    for (flp = &flog[NFLOGS]; --flp >= flog; )
-		if (flp->fl_fld == fld && flp->fl_usagecnt > 0) {
-		    flp->fl_val = val;
-		    (void) strncpy (flp->fl_str, str, sizeof(flp->fl_str)-1);
-		    return(0);
-		}
-	    return (-1);
-	} else
-	    return (0);
+    if (plot_ison() || listing_ison() || srch_ison())
+    {
+        FLog *flp;
+        int fld = rcfpack (r, c, 0);
+        for (flp = &flog[NFLOGS]; --flp >= flog; )
+            if (flp->fl_fld == fld && flp->fl_usagecnt > 0)
+            {
+                flp->fl_val = val;
+                (void) strncpy (flp->fl_str, str, sizeof(flp->fl_str)-1);
+                return(0);
+            }
+        return (-1);
+    }
+    else
+        return (0);
 }
 
 /* search for fld in list. if find it, return its value and str, if str.
@@ -108,14 +119,15 @@ int fld;
 double *vp;
 char *str;
 {
-	FLog *flp;
+    FLog *flp;
 
-	for (flp = &flog[NFLOGS]; --flp >= flog; )
-	    if (flp->fl_fld == fld && flp->fl_usagecnt > 0) {
-		*vp = flp->fl_val;
-		if (str) 
-		    (void) strcpy (str, flp->fl_str);
-		return (0);
-	    }
-	return (-1);
+    for (flp = &flog[NFLOGS]; --flp >= flog; )
+        if (flp->fl_fld == fld && flp->fl_usagecnt > 0)
+        {
+            *vp = flp->fl_val;
+            if (str)
+                (void) strcpy (str, flp->fl_str);
+            return (0);
+        }
+    return (-1);
 }

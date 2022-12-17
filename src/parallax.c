@@ -14,36 +14,37 @@ void ta_par (tha, tdec, phi, ht, ehp, aha, adec)
 double tha, tdec, phi, ht, ehp;
 double *aha, *adec;
 {
-	static double last_phi, last_ht, rsp, rcp;
-	double rp;	/* distance to object in Earth radii */
-	double ctha;
-	double stdec, ctdec;
-	double tdtha, dtha;
-	double caha;
+    static double last_phi, last_ht, rsp, rcp;
+    double rp;	/* distance to object in Earth radii */
+    double ctha;
+    double stdec, ctdec;
+    double tdtha, dtha;
+    double caha;
 
-	/* avoid calcs involving the same phi and ht */
-	if (phi != last_phi || ht != last_ht) {
-	    double cphi, sphi, u;
-	    cphi = cos(phi);
-	    sphi = sin(phi);
-	    u = atan(9.96647e-1*sphi/cphi);
-	    rsp = (9.96647e-1*sin(u))+(ht*sphi);
-	    rcp = cos(u)+(ht*cphi);
-	    last_phi  =  phi;
-	    last_ht  =  ht;
-	}
+    /* avoid calcs involving the same phi and ht */
+    if (phi != last_phi || ht != last_ht)
+    {
+        double cphi, sphi, u;
+        cphi = cos(phi);
+        sphi = sin(phi);
+        u = atan(9.96647e-1*sphi/cphi);
+        rsp = (9.96647e-1*sin(u))+(ht*sphi);
+        rcp = cos(u)+(ht*cphi);
+        last_phi  =  phi;
+        last_ht  =  ht;
+    }
 
-        rp = 1/sin(ehp);
+    rp = 1/sin(ehp);
 
-        ctha = cos(tha);
-	stdec = sin(tdec);
-	ctdec = cos(tdec);
-        tdtha = (rcp*sin(tha))/((rp*ctdec)-(rcp*ctha));
-        dtha = atan(tdtha);
-	*aha = tha+dtha;
-	caha = cos(*aha);
-	range (aha, 2*PI);
-        *adec = atan(caha*(rp*stdec-rsp)/(rp*ctdec*ctha-rcp));
+    ctha = cos(tha);
+    stdec = sin(tdec);
+    ctdec = cos(tdec);
+    tdtha = (rcp*sin(tha))/((rp*ctdec)-(rcp*ctha));
+    dtha = atan(tdtha);
+    *aha = tha+dtha;
+    caha = cos(*aha);
+    range (aha, 2*PI);
+    *adec = atan(caha*(rp*stdec-rsp)/(rp*ctdec*ctha-rcp));
 }
 
 #ifdef NEEDIT
@@ -60,21 +61,22 @@ void at_par (aha, adec, phi, ht, ehp, tha, tdec)
 double aha, adec, phi, ht, ehp;
 double *tha, *tdec;
 {
-	double nha, ndec;	/* ha/dec corres. to current true guesses */
-	double eha, edec;	/* error in ha/dec */
+    double nha, ndec;	/* ha/dec corres. to current true guesses */
+    double eha, edec;	/* error in ha/dec */
 
-	/* first guess for true is just the apparent */
-	*tha = aha;
-	*tdec = adec;
+    /* first guess for true is just the apparent */
+    *tha = aha;
+    *tdec = adec;
 
-	while (1) {
-	    ta_par (*tha, *tdec, phi, ht, ehp, &nha, &ndec);
-	    eha = aha - nha;
-	    edec = adec - ndec;
-	    if (fabs(eha)<1e-6 && fabs(edec)<1e-6)
-		break;
-	    *tha += eha;
-	    *tdec += edec;
-	}
+    while (1)
+    {
+        ta_par (*tha, *tdec, phi, ht, ehp, &nha, &ndec);
+        eha = aha - nha;
+        edec = adec - ndec;
+        if (fabs(eha)<1e-6 && fabs(edec)<1e-6)
+            break;
+        *tha += eha;
+        *tdec += edec;
+    }
 }
 #endif

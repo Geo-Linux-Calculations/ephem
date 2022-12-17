@@ -7,12 +7,12 @@
 
 /* size of screen */
 #ifdef NCURSES_LARGE
- #include <ncurses.h>
- #define	NR	LINES
- #define	NC	COLS
+#include <ncurses.h>
+#define	NR	LINES
+#define	NC	COLS
 #else
- #define	NR	24
- #define	NC	80
+#define	NR	24
+#define	NC	80
 #endif
 
 /* optional ANSI colors */
@@ -44,19 +44,20 @@
 #define COLOR_EARTH		25
 #define N_COLORS	26
 #ifdef ANSI_COLORS
-typedef struct {
-   char   *name;
-   int c1,c2,c3;
+typedef struct
+{
+    char   *name;
+    int c1,c2,c3;
 } APP_COLOR;
 APP_COLOR *App_Colors;
 void app_color();
 #define APP_COLOR_CMD  (N_COLORS+1000)
 int Colors_Enabled;
- #define COLOR_CODE(c) app_color(c)
- #define COLOR_OFF    if(Colors_Enabled)(void)fputs("\033[0m",stdout);
+#define COLOR_CODE(c) app_color(c)
+#define COLOR_OFF    if(Colors_Enabled)(void)fputs("\033[0m",stdout);
 #else
- #define COLOR_CODE(c) {}
- #define COLOR_OFF    {}
+#define COLOR_CODE(c) {}
+#define COLOR_OFF    {}
 #endif
 
 

@@ -25,7 +25,7 @@
  *     dis = horizon displacement (>0 is below ideal)             / rho|
  *     d = angle from pole = PI/2 - declination                /       |
  *     z = azimuth east of north                            /          |
- *     rho = polar rotation from down = PI - hour angle    /           | 
+ *     rho = polar rotation from down = PI - hour angle    /           |
  *   solve simultaneous equations for d1 and d2:         /             |
  *     1) cos(d) = cos(d1+d2)                           / d2           | lat
  *            = cos(d1)cos(d2) - sin(d1)sin(d2)        /               |
@@ -33,7 +33,7 @@
  *   then can solve for z1, z2 and rho, taking       /                 |
  *     care to preserve quadrant information.       /                 -|
  *                                              z1 /        z2       | |
- *                      ideal horizon ------------/--------------------| 
+ *                      ideal horizon ------------/--------------------|
  *                                         | |   /                     N
  *                                          -|  / d1
  *                                       dis | /
@@ -53,73 +53,80 @@ double *azr, *azs;
 int *status;
 {
 #define	EPS	(1e-6)	/* math rounding fudge - always the way, eh? */
-	double d;	/* angle from pole */
-	double h;	/* hour angle */
-	double crho;	/* cos hour-angle complement */
-	int shemi;	/* flag for southern hemisphere reflection */
+    double d;	/* angle from pole */
+    double h;	/* hour angle */
+    double crho;	/* cos hour-angle complement */
+    int shemi;	/* flag for southern hemisphere reflection */
 
-	d = PI/2 - dec;
+    d = PI/2 - dec;
 
-	/* reflect if in southern hemisphere.
-	 * (then reflect azimuth back after computation.)
-	 */
-	if ((shemi = (lat < 0))) {
-	    lat = -lat;
-	    d = PI - d;
-	}
+    /* reflect if in southern hemisphere.
+     * (then reflect azimuth back after computation.)
+     */
+    if ((shemi = (lat < 0)))
+    {
+        lat = -lat;
+        d = PI - d;
+    }
 
-	/* do the easy ones (and avoid violated assumptions) if d arc never
-	 * meets horizon. 
-	 */
-	if (d <= lat + dis + EPS) {
-	    *status = -1; /* never sets */
-	    return;
-	}
-	if (d >= PI - lat + dis - EPS) {
-	    *status = 1; /* never rises */
-	    return;
-	}
+    /* do the easy ones (and avoid violated assumptions) if d arc never
+     * meets horizon.
+     */
+    if (d <= lat + dis + EPS)
+    {
+        *status = -1; /* never sets */
+        return;
+    }
+    if (d >= PI - lat + dis - EPS)
+    {
+        *status = 1; /* never rises */
+        return;
+    }
 
-	/* find rising azimuth and cosine of hour-angle complement */
-	if (lat > EPS) {
-	    double d2, d1; /* polr arc to ideal hzn, and corrctn for apparent */
-	    double z2, z1; /* azimuth to ideal horizon, and " */
-	    double a;	   /* intermediate temp */
-	    double sdis, slat, clat, cz2, cd2;	/* trig temps */
-	    sdis = sin(dis);
-	    slat = sin(lat);
-	    a = sdis*sdis + slat*slat + 2*cos(d)*sdis*slat;
-	    if (a <= 0) {
-		*status = 2; /* can't happen - hah! */
-		return;
-	    }
-	    d1 = asin (sin(d) * sdis / sqrt(a));
-	    d2 = d - d1;
-	    cd2 = cos(d2);
-	    clat = cos(lat);
-	    cz2 = cd2/clat;
-	    z2 = acos (cz2);
-	    z1 = acos (cos(d1)/cos(dis));
-	    if (dis < 0)
-		z1 = -z1;
-	    *azr = z1 + z2;
-	    range (azr, PI);
-	    crho = (cz2 - cd2*clat)/(sin(d2)*slat);
-	} else {
-	    *azr = acos (cos(d)/cos(dis));
-	    crho = sin(dis)/sin(d);
-	}
+    /* find rising azimuth and cosine of hour-angle complement */
+    if (lat > EPS)
+    {
+        double d2, d1; /* polr arc to ideal hzn, and corrctn for apparent */
+        double z2, z1; /* azimuth to ideal horizon, and " */
+        double a;	   /* intermediate temp */
+        double sdis, slat, clat, cz2, cd2;	/* trig temps */
+        sdis = sin(dis);
+        slat = sin(lat);
+        a = sdis*sdis + slat*slat + 2*cos(d)*sdis*slat;
+        if (a <= 0)
+        {
+            *status = 2; /* can't happen - hah! */
+            return;
+        }
+        d1 = asin (sin(d) * sdis / sqrt(a));
+        d2 = d - d1;
+        cd2 = cos(d2);
+        clat = cos(lat);
+        cz2 = cd2/clat;
+        z2 = acos (cz2);
+        z1 = acos (cos(d1)/cos(dis));
+        if (dis < 0)
+            z1 = -z1;
+        *azr = z1 + z2;
+        range (azr, PI);
+        crho = (cz2 - cd2*clat)/(sin(d2)*slat);
+    }
+    else
+    {
+        *azr = acos (cos(d)/cos(dis));
+        crho = sin(dis)/sin(d);
+    }
 
-	if (shemi)
-	    *azr = PI - *azr;
-        *azs = 2*PI - *azr;
-	
-	/* find hour angle */
-	h = PI - acos (crho);
-        *lstr = radhr(ra-h);
-	*lsts = radhr(ra+h);
-	range (lstr, 24.0);
-	range (lsts, 24.0);
+    if (shemi)
+        *azr = PI - *azr;
+    *azs = 2*PI - *azr;
 
-	*status = 0;
+    /* find hour angle */
+    h = PI - acos (crho);
+    *lstr = radhr(ra-h);
+    *lsts = radhr(ra+h);
+    range (lstr, 24.0);
+    range (lsts, 24.0);
+
+    *status = 0;
 }

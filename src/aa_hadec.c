@@ -12,48 +12,49 @@ double lat;
 double x, y;
 double *p, *q;
 {
-	static double lastlat = -1000.;
-	static double sinlastlat, coslastlat;
-	double sy, cy;
-	double sx, cx;
-	double sq, cq;
-	double a;
-	double cp;
+    static double lastlat = -1000.;
+    static double sinlastlat, coslastlat;
+    double sy, cy;
+    double sx, cx;
+    double sq, cq;
+    double a;
+    double cp;
 
-	/* latitude doesn't change much, so try to reuse the sin and cos evals.
-	 */
-	if (lat != lastlat) {
-	    sinlastlat = sin (lat);
-	    coslastlat = cos (lat);
-	    lastlat = lat;
-	}
+    /* latitude doesn't change much, so try to reuse the sin and cos evals.
+     */
+    if (lat != lastlat)
+    {
+        sinlastlat = sin (lat);
+        coslastlat = cos (lat);
+        lastlat = lat;
+    }
 
-	sy = sin (y);
-	cy = cos (y);
-	sx = sin (x);
-	cx = cos (x);
+    sy = sin (y);
+    cy = cos (y);
+    sx = sin (x);
+    cx = cos (x);
 
-/* define GOODATAN2 if atan2 returns full range -PI through +PI.
- */
+    /* define GOODATAN2 if atan2 returns full range -PI through +PI.
+     */
 #ifdef GOODATAN2
-	*q = asin ((sy*sinlastlat) + (cy*coslastlat*cx));
-	*p = atan2 (-cy*sx, -cy*cx*sinlastlat + sy*coslastlat);
+    *q = asin ((sy*sinlastlat) + (cy*coslastlat*cx));
+    *p = atan2 (-cy*sx, -cy*cx*sinlastlat + sy*coslastlat);
 #else
 #define	EPS	(1e-20)
-	sq = (sy*sinlastlat) + (cy*coslastlat*cx);
-	*q = asin (sq);
-	cq = cos (*q);
-	a = coslastlat*cq;
-	if (a > -EPS && a < EPS)
-	    a = a < 0 ? -EPS : EPS; /* avoid / 0 */
-	cp = (sy - (sinlastlat*sq))/a;
-	if (cp >= 1.0)	/* the /a can be slightly > 1 */
-	    *p = 0.0;
-	else if (cp <= -1.0)
-	    *p = PI;
-	else
-	    *p = acos ((sy - (sinlastlat*sq))/a);
-	if (sx>0) *p = 2.0*PI - *p;
+    sq = (sy*sinlastlat) + (cy*coslastlat*cx);
+    *q = asin (sq);
+    cq = cos (*q);
+    a = coslastlat*cq;
+    if (a > -EPS && a < EPS)
+        a = a < 0 ? -EPS : EPS; /* avoid / 0 */
+    cp = (sy - (sinlastlat*sq))/a;
+    if (cp >= 1.0)	/* the /a can be slightly > 1 */
+        *p = 0.0;
+    else if (cp <= -1.0)
+        *p = PI;
+    else
+        *p = acos ((sy - (sinlastlat*sq))/a);
+    if (sx>0) *p = 2.0*PI - *p;
 #endif
 }
 
@@ -66,7 +67,7 @@ double lat;
 double alt, az;
 double *ha, *dec;
 {
-	aaha_aux (lat, az, alt, ha, dec);
+    aaha_aux (lat, az, alt, ha, dec);
 }
 
 /* given latitude (n+, radians), lat, hour angle (radians), ha, and declination
@@ -79,6 +80,6 @@ double lat;
 double ha, dec;
 double *alt, *az;
 {
-	aaha_aux (lat, ha, dec, az, alt);
+    aaha_aux (lat, ha, dec, az, alt);
 }
 

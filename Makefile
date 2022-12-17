@@ -57,7 +57,8 @@ $(PROJECT): $(OBJS)
 	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
 
 install: $(PROJECT)
-	cp $(PROJECT) $(PREFIX)/bin
+	$(INSTALL) -d $(PREFIX)/bin
+	$(INSTALL) -m 0755 $(PROJECT) $(PREFIX)/bin
 
 clean:
 	$(RM) $(PROJECT) $(OBJS)

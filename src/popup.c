@@ -25,52 +25,62 @@ char *fields[];
 int fn;
 int nfields;
 {
-	int fcols[MAXFLDS];	/* column to use for each field */
-	int i;
+    int fcols[MAXFLDS];	/* column to use for each field */
+    int i;
 
-	if (nfields > MAXFLDS)
-	    return (-1);
+    if (nfields > MAXFLDS)
+        return (-1);
 
-    again:
-	/* erase the prompt line; we are going to take it over */
-	c_pos (R_PROMPT, C_PROMPT);
-	c_eol();
+again:
+    /* erase the prompt line; we are going to take it over */
+    c_pos (R_PROMPT, C_PROMPT);
+    c_eol();
 
-	/* compute starting column for each field */
-	fcols[0] = sizeof(pup);
-	for (i = 1; i < nfields; i++)
-	    fcols[i] = fcols[i-1] + strlen (fields[i-1]) + FLDGAP;
+    /* compute starting column for each field */
+    fcols[0] = sizeof(pup);
+    for (i = 1; i < nfields; i++)
+        fcols[i] = fcols[i-1] + strlen (fields[i-1]) + FLDGAP;
 
-	/* draw each field, with comma after all but last */
-	c_pos (R_PROMPT, 1);
-	(void) fputs (pup, stdout);
-	for (i = 0; i < nfields; i++) {
-	    c_pos (R_PROMPT, fcols[i]);
-	    printf (i < nfields-1 ? "%s," : "%s", fields[i]);
-	}
+    /* draw each field, with comma after all but last */
+    c_pos (R_PROMPT, 1);
+    (void) fputs (pup, stdout);
+    for (i = 0; i < nfields; i++)
+    {
+        c_pos (R_PROMPT, fcols[i]);
+        printf (i < nfields-1 ? "%s," : "%s", fields[i]);
+    }
 
-	/* let op choose one now; begin at fn.
-	 */
-	while (1) {
-	    c_pos (R_PROMPT, fcols[fn]);
-	    switch (read_char()) {
-	    case END: return (-1);
-	    case QUIT:
-		f_prompt ("Exit ephem? (y) ");
-		if (read_char() == 'y')
-		    bye();	/* never returns */
-		goto again;
-	    case REDRAW: redraw_screen(2); goto again;
-	    case VERSION: version(); goto again;
-	    case '\r': case ' ': return (fn);
-	    case 'h':
-		if (--fn < 0)
-		    fn = nfields - 1;
-		break;
-	    case 'l':
-		if (++fn >= nfields)
-		    fn = 0;
-		break;
-	    }
-	}
+    /* let op choose one now; begin at fn.
+     */
+    while (1)
+    {
+        c_pos (R_PROMPT, fcols[fn]);
+        switch (read_char())
+        {
+        case END:
+            return (-1);
+        case QUIT:
+            f_prompt ("Exit ephem? (y) ");
+            if (read_char() == 'y')
+                bye();	/* never returns */
+            goto again;
+        case REDRAW:
+            redraw_screen(2);
+            goto again;
+        case VERSION:
+            version();
+            goto again;
+        case '\r':
+        case ' ':
+            return (fn);
+        case 'h':
+            if (--fn < 0)
+                fn = nfields - 1;
+            break;
+        case 'l':
+            if (++fn >= nfields)
+                fn = 0;
+            break;
+        }
+    }
 }

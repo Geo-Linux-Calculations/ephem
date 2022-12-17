@@ -13,14 +13,14 @@ void constellation_msg (p, np)
 int p;
 Now *np;
 {
-	char buf[NC];
-	char *name;
-	Sky s;
+    char buf[NC];
+    char *name;
+    Sky s;
 
-	(void) body_cir (p, 0.0, np, &s);
-	confnd (s.s_ra, s.s_dec, epoch == EOD ? mjd : epoch, &name);
-	sprintf (buf, "In %s", name);
-	f_msg (buf);
+    (void) body_cir (p, 0.0, np, &s);
+    confnd (s.s_ra, s.s_dec, epoch == EOD ? mjd : epoch, &name);
+    sprintf (buf, "In %s", name);
+    f_msg (buf);
 }
 
 /*
@@ -37,12 +37,12 @@ exerpt from accompanying doc file:
   in which a position is located.
 
 NSSDC catalog description:
- 6042   AN     Catalog of Constellation Boundary Data (Delporte, E. 1930, 
+ 6042   AN     Catalog of Constellation Boundary Data (Delporte, E. 1930,
                Cambridge Univ. Press)
-               Comment(s): includes constellation identification software 
-               (ADC 1987; see Roman, N.G. 1987, Publ. Astron. Soc. Pacific 
-               99, 695); 23 description, 118 software, 358 data records. 
-               3 files: 23x80, 118x80, 358x29 
+               Comment(s): includes constellation identification software
+               (ADC 1987; see Roman, N.G. 1987, Publ. Astron. Soc. Pacific
+               99, 695); 23 description, 118 software, 358 data records.
+               3 files: 23x80, 118x80, 358x29
 
 full documentation file:
 
@@ -162,10 +162,12 @@ static char Vir[] = "Vir: Virgo";
 static char Vol[] = "Vol: Volans";
 static char Vul[] = "Vul: Vulpecula";
 
-struct cdata {
+struct cdata
+{
     double l_ra, u_ra, l_dec;
     char *cons;
-} con_data[] = {
+} con_data[] =
+{
     {0.0000, 24.0000, 88.0000, UMi},
     {8.0000, 14.5000, 86.5000, UMi},
     {21.0000, 23.0000, 86.1667, UMi},
@@ -534,23 +536,23 @@ void confnd(r, d, e, name)
 double r, d, e;
 char **name;
 {
-	double ra1875, de1875, mjd1875;
-	int i;
+    double ra1875, de1875, mjd1875;
+    int i;
 
-	cal_mjd (1, 1.0, 1875, &mjd1875);
-	precess (e, mjd1875, &r, &d);
-	    
-	/* find constellation such that the declination entered is higher than
-	 * the lower boundary of the constellation when the upper and lower
-	 * right ascensions for the constellation bound the entered right
-	 * ascension
-	 */
-	i = 0;
-	ra1875 = radhr (r);
-	de1875 = raddeg (d);
-	while ((con_data[i].l_dec > de1875 || con_data[i].u_ra <= ra1875
-		     || con_data[i].l_ra > ra1875) && con_data[i].cons[0])
-	     i++;
+    cal_mjd (1, 1.0, 1875, &mjd1875);
+    precess (e, mjd1875, &r, &d);
 
-	*name = con_data[i].cons[0] ? con_data[i].cons : "<No constellation?!>";
+    /* find constellation such that the declination entered is higher than
+     * the lower boundary of the constellation when the upper and lower
+     * right ascensions for the constellation bound the entered right
+     * ascension
+     */
+    i = 0;
+    ra1875 = radhr (r);
+    de1875 = raddeg (d);
+    while ((con_data[i].l_dec > de1875 || con_data[i].u_ra <= ra1875
+            || con_data[i].l_ra > ra1875) && con_data[i].cons[0])
+        i++;
+
+    *name = con_data[i].cons[0] ? con_data[i].cons : "<No constellation?!>";
 }

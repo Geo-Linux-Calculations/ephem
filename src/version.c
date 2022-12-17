@@ -9,9 +9,9 @@ static char vmsg[] = "Version 4.32 December 10, 2021";
 /*
  * 4.32 12/10/21 globe.c watch.c sel_fld.c plot.c main.c tags formats.c ephem.h listing.c io.c
  *            lint to run on macOS; no changes in functionality
- * 4.31 12/14/15 screen.h main.c sel_fld.c version.c watch.c mods 
+ * 4.31 12/14/15 screen.h main.c sel_fld.c version.c watch.c mods
  *            "Doug" <semaphore_2000@yahoo.com>
- *              - -DNCURSES_LARGE uses ncurses LINES,COLS SIGWINCH for 
+ *              - -DNCURSES_LARGE uses ncurses LINES,COLS SIGWINCH for
  *                 non- 25x80 terminals and dynamic resizing
  *              - -DANSI_COLORS use ANSI color codes, reverse, bold, etc;
  *                 also, colors may be customized with COLOR=... config
@@ -21,9 +21,9 @@ static char vmsg[] = "Version 4.32 December 10, 2021";
  *                      cmake .
  *                      make
  *                      make install
- *              - switched from termcap to ncurses 
+ *              - switched from termcap to ncurses
  *              - added Watch|Earth,Moon features, by splicing in "phoon"
- *                and "globe" written by Jef Poskanzer <jef@mail.acme.com>; 
+ *                and "globe" written by Jef Poskanzer <jef@mail.acme.com>;
  *                http://acme.com/software (optional; -DGLOBE_PHOON)
  *              - added -K switch (enter sky dome directly)
  *              - minor code changes (added some .h headers, etc)
@@ -32,9 +32,9 @@ static char vmsg[] = "Version 4.32 December 10, 2021";
  * 4.29 9/3/00  Jonathan Woithe, jwoithe@physics.adelaide.edu.au
  *              Changes motivated by the program freezing after several
  *              "q" operations when compiled on Linux 2.2.13/egcs 1.1.2.
- *              (When compiled with -g the program also segfaulted whenever 
+ *              (When compiled with -g the program also segfaulted whenever
  *              the date was changed.)
- *                - creation of ephem.h to contain all extern function 
+ *                - creation of ephem.h to contain all extern function
  *                  prototypes
  *                - inserted explicit typing on all functions
  *                - use system-provided includes rather than either manually
@@ -56,7 +56,7 @@ static char vmsg[] = "Version 4.32 December 10, 2021";
  *		add casts to setting srch_f to 0 via ?: for better portability.
  *	10/16	bona fide menu option for moons.
  *	10/18	add SPACE as an alternative to RETURN for picking.
- *	10/19	wrap long listing file lines. 
+ *	10/19	wrap long listing file lines.
  *	10/24	disregard Pause while listing too.
  *	10/25	obj lookup now lets you pick from a table.
  *	10/27	add sqrt as a builtin search function
@@ -226,54 +226,55 @@ static char vmsg[] = "Version 4.32 December 10, 2021";
 
 void version()
 {
-	f_msg (vmsg);
+    f_msg (vmsg);
 }
 
-static char *cre[] = {
-"Ephem - an interactive astronomical ephemeris program",
-vmsg,
-"",
-"Copyright (c) 1990,1991,1992,2021 by Elwood Charles Downey, ecdowney@clearskyinstitute.com",
-"Copyright (C) 1986,1987,1988,1995 by Jef Poskanzer <jef@mail.acme.com>",
-"Copyright (C) 2015 by Doug Snead, semaphore_2000@yahoo.com",
-"(Code cleanup by Jonathan Woithe, March 2000)",
-"",
-"Permission is granted to make and distribute copies of this program free of",
-"charge, provided the copyright notices and this permission notice are",
-"preserved on all copies.  All other rights reserved.  No representation is",
-"made about the suitability of this software for any purpose.  It is provided",
-"\"as is\" without express or implied warranty, to the extent permitted by",
-"applicable law.",
-"",
-/*
-"Many formulas and tables are based, with permission, on material found in",
-"\"Astronomy with your Personal Computer\" by Dr. Peter Duffett-Smith,",
-"Cambridge University Press, (c) 1985.  Constellation algorithm from a paper",
-"by Nancy G.  Roman, \"Identification of a constellation from a position\",",
-"Publications of the Astronomical Society of the Pacific, Vol.  99, p.",
-"695-699, July 1987.  Precession routine from 1989 Astronomical Almanac.",
-"Jupiter's moons based on information in \"Astronomical Formulae for",
-"Calculators\" by Jean Meeus.  Richmond, Va., U.S.A., Willmann-Bell, (c) 1982.",
-*/
-"See the manual (Man.txt) for a list of references.",
-"",
-"type any key to continue..."
+static char *cre[] =
+{
+    "Ephem - an interactive astronomical ephemeris program",
+    vmsg,
+    "",
+    "Copyright (c) 1990,1991,1992,2021 by Elwood Charles Downey, ecdowney@clearskyinstitute.com",
+    "Copyright (C) 1986,1987,1988,1995 by Jef Poskanzer <jef@mail.acme.com>",
+    "Copyright (C) 2015 by Doug Snead, semaphore_2000@yahoo.com",
+    "(Code cleanup by Jonathan Woithe, March 2000)",
+    "",
+    "Permission is granted to make and distribute copies of this program free of",
+    "charge, provided the copyright notices and this permission notice are",
+    "preserved on all copies.  All other rights reserved.  No representation is",
+    "made about the suitability of this software for any purpose.  It is provided",
+    "\"as is\" without express or implied warranty, to the extent permitted by",
+    "applicable law.",
+    "",
+    /*
+    "Many formulas and tables are based, with permission, on material found in",
+    "\"Astronomy with your Personal Computer\" by Dr. Peter Duffett-Smith,",
+    "Cambridge University Press, (c) 1985.  Constellation algorithm from a paper",
+    "by Nancy G.  Roman, \"Identification of a constellation from a position\",",
+    "Publications of the Astronomical Society of the Pacific, Vol.  99, p.",
+    "695-699, July 1987.  Precession routine from 1989 Astronomical Almanac.",
+    "Jupiter's moons based on information in \"Astronomical Formulae for",
+    "Calculators\" by Jean Meeus.  Richmond, Va., U.S.A., Willmann-Bell, (c) 1982.",
+    */
+    "See the manual (Man.txt) for a list of references.",
+    "",
+    "type any key to continue..."
 };
 
 void credits()
 {
-	int r;
-	int l;
-	int nr;
+    int r;
+    int l;
+    int nr;
 
-	c_erase();
-	COLOR_CODE(COLOR_VERSION);
+    c_erase();
+    COLOR_CODE(COLOR_VERSION);
 
-	nr = sizeof(cre)/sizeof(cre[0]);
-	r = (NR - nr)/2 + 1;
-	for (l = 0; l < nr; l++)
-	    f_string (r++, (NC - strlen(cre[l]))/2, cre[l]);
+    nr = sizeof(cre)/sizeof(cre[0]);
+    r = (NR - nr)/2 + 1;
+    for (l = 0; l < nr; l++)
+        f_string (r++, (NC - strlen(cre[l]))/2, cre[l]);
 
-	COLOR_OFF;
-	(void) read_char();	/* wait for any char to continue */
+    COLOR_OFF;
+    (void) read_char();	/* wait for any char to continue */
 }
